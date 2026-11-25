@@ -138,6 +138,65 @@ table.perm td:nth-child(n+2),table.perm th:nth-child(n+2){text-align:center;widt
 <main id="view"></main>
 <script>
 {
+/* ===== ProgLab · entrega à professora (comum a todas as plataformas) =====
+   Sem servidor: gera um ficheiro .json que os alunos entregam (Classroom, Teams, pen).
+   O código de turma e os prazos ficam guardados neste navegador e são partilhados
+   por todas as páginas do mesmo site. */
+const PL=(()=>{
+  const ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',SK='proglab-turma-v1';
+  const clean=c=>String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const chk=s=>{let t=0;for(let i=0;i<s.length;i++)t+=(ABC.indexOf(s[i])+1)*(i+3);return ABC[t%32]};
+  const valid=c=>{const s=clean(c);return s.length===6&&[...s].every(x=>ABC.includes(x))&&chk(s.slice(0,5))===s[5]};
+  const fmt=c=>{const s=clean(c);return s.length>3?s.slice(0,3)+'-'+s.slice(3):s};
+  const cyrb=(str,seed=0)=>{let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return(h2>>>0).toString(16).padStart(8,'0')+(h1>>>0).toString(16).padStart(8,'0')};
+  const seal=(o,code)=>cyrb(JSON.stringify(o)+'|'+clean(code),0x50524f47);
+  let st={code:'',prazos:{}};
+  try{const r=JSON.parse(localStorage.getItem(SK)||'null');if(r)st={code:r.code||'',prazos:r.prazos||{}}}catch(e){}
+  const keep=()=>{try{localStorage.setItem(SK,JSON.stringify(st))}catch(e){}};
+  /* ligação da professora: ?turma=ABC-DEF&p=W5.2026-12-10~L5.2027-01-15 */
+  try{const q=new URLSearchParams(location.search);const t=q.get('turma');
+    if(t&&valid(t)){if(clean(t)!==clean(st.code))st.prazos={};st.code=fmt(t)}
+    const p=q.get('p');if(p&&t&&valid(t)){st.prazos={};p.split('~').forEach(x=>{const m=x.match(/^([A-Za-z0-9-]+)\.(\d{4}-\d{2}-\d{2})$/);if(m)st.prazos[m[1].toUpperCase()]=m[2]})}
+    if(t)keep()}catch(e){}
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const dpt=d=>{const[y,m,dd]=d.split('-');return `${dd}/${m}/${y}`};
+  const css=`.pl-box{border:2px solid #11161d;border-radius:12px;padding:16px 18px;margin:0 0 20px;background:#fff;color:#11161d;font:inherit;max-width:820px}
+.pl-box h3{margin:0 0 4px;font-size:1.1rem}.pl-box p{margin:6px 0}.pl-box .pl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+.pl-box input{font:inherit;font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 10px;border:1.5px solid #5b6470;border-radius:8px;width:9.5em}
+.pl-box button{font:inherit;font-weight:700;padding:9px 16px;border-radius:8px;border:0;background:#11161d;color:#fff;cursor:pointer}
+.pl-box button:disabled{opacity:.45;cursor:not-allowed}.pl-box .pl-ok{color:#0b7a3b;font-weight:600}.pl-box .pl-bad{color:#b3261e;font-weight:600}
+.pl-box .pl-msg{min-height:1.3em}.pl-box ul{margin:6px 0 0;padding-left:20px}.pl-box .pl-late{color:#b3261e;font-weight:600}.pl-box small{color:#5b6470}`;
+  function panel(el,cfg){
+    if(!document.getElementById('pl-css')){const s=document.createElement('style');s.id='pl-css';s.textContent=css;document.head.append(s)}
+    const draw=()=>{
+      const ok=valid(st.code);const ids=cfg.labIds();const today=new Date().toISOString().slice(0,10);
+      const pz=ids.filter(id=>st.prazos[id]).map(id=>`<li>${esc(cfg.labName(id))}: até ${dpt(st.prazos[id])}${st.prazos[id]<today?' <span class="pl-late">(prazo ultrapassado)</span>':''}</li>`).join('');
+      el.innerHTML=`<div class="pl-box" role="region" aria-label="Entrega à professora"><h3>Entregar à professora</h3>
+<p>Descarreguem o ficheiro de entrega e enviem-no à professora pelo canal combinado (Classroom, Teams ou pen). Podem entregar várias vezes: fica a versão mais recente.</p>
+<div class="pl-row"><label for="pl-code"><b>Código de turma</b></label><input id="pl-code" value="${esc(st.code)}" maxlength="7" autocomplete="off" spellcheck="false" placeholder="ABC-DEF"><span id="pl-cs" class="${ok?'pl-ok':st.code?'pl-bad':''}">${ok?'Código válido':st.code?'Código inválido: confirmem com a professora':''}</span></div>
+${pz?`<p style="margin-top:10px"><b>Prazos</b></p><ul>${pz}</ul>`:''}
+<div class="pl-row"><button id="pl-dl" ${ok?'':'disabled'}>Descarregar ficheiro de entrega</button><span class="pl-msg" id="pl-msg"></span></div>
+<p><small>O ficheiro tem os vossos nomes, números e o trabalho feito nesta página. Não é enviado para nenhum servidor.</small></p></div>`;
+      const inp=el.querySelector('#pl-code');
+      inp.oninput=()=>{const v=fmt(inp.value);if(clean(v)!==clean(st.code))st.prazos={};st.code=v;keep();const cs=el.querySelector('#pl-cs');const k=valid(v);cs.className=k?'pl-ok':v?'pl-bad':'';cs.textContent=k?'Código válido':clean(v).length<6?'':'Código inválido: confirmem com a professora';el.querySelector('#pl-dl').disabled=!k;cfg.onCode&&cfg.onCode(st.code)};
+      inp.onblur=()=>{inp.value=st.code};
+      el.querySelector('#pl-dl').onclick=()=>{const msg=el.querySelector('#pl-msg');const prob=cfg.check?cfg.check():null;if(prob){msg.className='pl-msg pl-bad';msg.textContent=prob;return}
+        const b=cfg.build();const body={formato:'proglab-entrega',versao:1,disciplina:cfg.disciplina,plataforma:cfg.plataforma,app:cfg.app,turma:fmt(st.code),equipa:b.equipa,alunos:b.alunos,geradoEm:new Date().toISOString(),labs:b.labs.filter(l=>l.estado!=='por_iniciar'),relatorio:b.relatorio||''};
+        if(!body.labs.length){msg.className='pl-msg pl-bad';msg.textContent='Ainda não há trabalho para entregar nesta página.';return}
+        const file={...body,selo:seal(body,st.code)};
+        const nums=b.alunos.map(a=>a.num).filter(Boolean).join('-').replace(/[^\w-]+/g,'')||'alunos';
+        const name=`entrega-${cfg.disciplina}-${cfg.app}-eq${b.equipa}-${nums}-${body.geradoEm.slice(0,10)}.json`;
+        try{const u=URL.createObjectURL(new Blob([JSON.stringify(file,null,1)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);
+          msg.className='pl-msg pl-ok';msg.textContent=`Ficheiro «${name}» criado com ${body.labs.length} laboratório${body.labs.length>1?'s':''}. Enviem-no à professora.`}catch(e){msg.className='pl-msg pl-bad';msg.textContent='O navegador bloqueou a transferência. Experimentem outro navegador.'}};
+    };
+    draw();return{redraw:draw}}
+  /* utilitários para os adaptadores */
+  const errs=tx=>(tx||[]).filter(o=>o&&o.e).length;
+  const qscore=(n,ans,att)=>{let s=0;for(let j=0;j<n;j++)if(ans[j]===0)s+=att&&att[j]?0.5:1;return n?s/n:0};
+  const gen=()=>{const a=new Uint32Array(5);crypto.getRandomValues(a);let s='';a.forEach(x=>s+=ABC[x%32]);return fmt(s+chk(s))};
+  return{panel,valid,fmt,gen,clean,cyrb,code:()=>st.code,setCode:c=>{const v=fmt(c);if(clean(v)!==clean(st.code))st.prazos={};st.code=v;keep()},prazos:()=>st.prazos,errs,qscore,seal}
+})();
+
 /* ===== Cenários das equipas ===== */
 const TEAMS=[
  {emp:'Clínica Sorriso',gA:'rececao',gB:'medicos',lA:'Receção',lB:'Médicos',u:['ana','bruno','carla'],n:['Ana Reis','Bruno Lima','Carla Mota'],fA:'Marcacoes',fB:'Fichas'},
@@ -512,7 +571,7 @@ function makeTerm(el,cfg){
   const out=document.createElement('div');const row=document.createElement('div');row.className='tin';const pr=document.createElement('span');const inp=document.createElement('input');inp.setAttribute('aria-label','Comando');inp.autocomplete='off';inp.spellcheck=false;inp.setAttribute('autocapitalize','off');row.append(pr,inp);el.append(out,row);
   let queue=null,vals=[],cb=null,hi=-1;
   const line=o=>{const d=document.createElement('div');if(o.c!==undefined){(o.p||[]).forEach(x=>{const s=document.createElement('span');s.className=x.c||'';s.textContent=x.t;d.append(s)});d.append(document.createTextNode(o.c))}else{d.textContent=o.o;if(o.e)d.className='er'}out.append(d)};
-  const push=o=>{st.tx.push(o);if(st.tx.length>260)st.tx.splice(0,st.tx.length-260);line(o)};
+  const push=o=>{if(o.e&&!o.re)st.errs=(st.errs||0)+1;st.tx.push(o);if(st.tx.length>260)st.tx.splice(0,st.tx.length-260);line(o)};
   const prompt=()=>{pr.innerHTML='';if(queue){pr.textContent=queue[0]+' ';inp.type='password';return}inp.type='text';cfg.prompt().forEach(x=>{const s=document.createElement('span');s.className=x.c||'';s.textContent=x.t;pr.append(s)})};
   const ask=(labels,f)=>{queue=labels.slice();vals=[];cb=f};
   const emit=res=>{(res||[]).forEach(o=>{if(o&&o.clear){st.tx=[];out.innerHTML='';return}push(typeof o==='string'?{o}:{o:o.s,e:o.e})})};
@@ -600,7 +659,7 @@ function renderLab(id){
   $('#view').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{s.phase=b.dataset.go;save();renderLab(id);$('.phases').scrollIntoView({block:'start'})});
 }
 function nextBtn(ph){const n=PHASES.find(p=>p[0]===ph);return `<div class="next"><button data-go="${ph}">Seguinte: ${n[1]} →</button></div>`}
-function refreshPhases(id){document.querySelectorAll('.phases [data-ph]').forEach((b,i)=>{const ok=phaseDone(id,b.dataset.ph);b.classList.toggle('ok',ok);b.querySelector('i').textContent=ok?'✓':i+1});const h=$('.lhead h2');if(h&&labDone(id)&&!h.querySelector('.badge'))h.insertAdjacentHTML('beforeend','<span class="badge">Concluído</span>');if(labDone(id)&&!LS(id).done){LS(id).done=true;LS(id).doneAt=new Date().toLocaleString('pt-PT');save()}}
+function refreshPhases(id){document.querySelectorAll('.phases [data-ph]').forEach((b,i)=>{const ok=phaseDone(id,b.dataset.ph);b.classList.toggle('ok',ok);b.querySelector('i').textContent=ok?'✓':i+1});const h=$('.lhead h2');if(h&&labDone(id)&&!h.querySelector('.badge'))h.insertAdjacentHTML('beforeend','<span class="badge">Concluído</span>');if(labDone(id)&&!LS(id).done){LS(id).done=true;LS(id).doneAt=new Date().toISOString();save()}}
 function paintMis(id){const el=$('#mis');if(!el)return;const ms=misState(id);const first=ms.findIndex(x=>!x.done&&!x.opt);el.innerHTML=ms.map((x,i)=>`<li class="${x.done?'done':''} ${i===first?'cur':''} ${x.opt?'xopt':''}"><b>${esc(x.t)}</b>${esc(x.d)}<details><summary>Pista</summary><code>${esc(x.h)}</code></details></li>`).join('');refreshPhases(id)}
 function mountEnv(id,which){const L=LABS[id],s=LS(id),m=s[which],el=$('#env');const after=()=>{save();if(which==='prac')paintMis(id);else s.__upd&&s.__upd()};
   if(L.env==='win'){el.className='envbox win';const host=document.createElement('div');el.innerHTML='';el.append(host);host.addEventListener('click',e=>wClick(host,e));wRender(host,m,after)}
@@ -648,7 +707,30 @@ function report(){const L=[],A=s=>L.push(s);const t=T();
     A('Registo de ações (prática):');s.prac.log.slice(-25).forEach(x=>A('  '+x));if(s.prac.hist?.length){A('Últimos comandos (prática):');s.prac.hist.slice(-20).forEach(x=>A('  > '+x))}
     A('Registo de ações (avaria):');s.fault.log.slice(-15).forEach(x=>A('  '+x));if(s.fault.hist?.length){A('Últimos comandos (avaria):');s.fault.hist.slice(-12).forEach(x=>A('  > '+x))}});
   return L.join('\n')}
-function renderReport(){$('#view').innerHTML=`<section class="narrow"><h2>Relatório</h2><p class="lead">Inclui a identificação, o estado das fases, as missões, a avaria, as respostas e o registo de ações e comandos.</p><div class="row"><button id="rcopy">Copiar relatório</button><button class="ghost" id="rdl">Descarregar (.txt)</button><span id="rmsg" class="small"></span></div><pre class="rep" id="rep"></pre></section>`;$('#rep').textContent=report();
+/* ===== entrega à professora ===== */
+function wc(s){return words(s).length}
+function plLab(id){const Lb=LABS[id],s=TS()[id],t=T();const base={id:Lb.code,titulo:`${Lb.code} · ${Lb.title}`};
+  if(!s)return{...base,estado:'por_iniciar'};
+  const ms=misState(id),req=ms.filter(x=>!x.opt);let fx=false;try{fx=!!Lb.fixed(s.fault,t)}catch(e){}
+  const Q=QUIZ[id],m=[s.prac,s.fault];const hist=[...(s.prac.hist||[]).map(c=>({onde:'Prática',c})),...(s.fault.hist||[]).map(c=>({onde:'Avaria',c}))];
+  const errs=m.reduce((n,x)=>n+(x.errs||0),0);
+  const touched=s.seen.aprender||hist.length||Object.keys(s.ans).length||s.diag||s.refl||(s.prac.log||[]).length;
+  return{...base,estado:labDone(id)?'concluido':touched?'em_curso':'por_iniciar',concluidoEm:/^\d{4}-/.test(s.doneAt||'')?s.doneAt:'',
+    fases:PHASES.map(([p,n])=>({nome:n,ok:phaseDone(id,p)})),
+    componentes:[{nome:'Missões obrigatórias',valor:req.length?req.filter(x=>x.done).length/req.length:0,detalhe:`${req.filter(x=>x.done).length}/${req.length}`},
+      {nome:'Avaria resolvida',valor:fx?1:0,detalhe:fx?'sim':'não'},
+      {nome:'Perguntas (meio valor depois de erro)',valor:PL.qscore(Q.length,s.ans,s.att),detalhe:`${Q.filter((q,j)=>s.ans[j]===0).length}/${Q.length} certas`},
+      {nome:'Respostas escritas com o mínimo de palavras',valor:((wc(s.diag)>=25)+(wc(s.refl)>=40))/2,detalhe:`${wc(s.diag)} e ${wc(s.refl)} palavras`}],
+    missoes:ms.map(x=>({t:x.t,ok:x.done,opt:!!x.opt})),
+    perguntas:Q.map((q,j)=>({p:q[0],ok:s.ans[j]===0,respondida:s.ans[j]!==undefined,erros:s.att[j]||0})),
+    respostas:[{p:'Diagnóstico da avaria (mín. 25 palavras)',r:s.diag||''},{p:'Comparação Windows / Linux (mín. 40 palavras)',r:s.refl||''}],
+    comandos:hist,acoes:[...(s.prac.log||[]).map(x=>'Prática · '+x),...(s.fault.log||[]).map(x=>'Avaria · '+x)],
+    tentativas:hist.length,errosComando:errs}}
+function plMount(){const el=$('#plbox');if(!el)return;PL.panel(el,{disciplina:'SO',plataforma:'SO Lab · Trilhos',app:'trilhos',
+  labIds:()=>Object.values(LABS).map(l=>l.code),labName:c=>{const l=Object.values(LABS).find(x=>x.code===c);return l?`${l.code} · ${l.title}`:c},
+  check:()=>(!ALL.id.a.num||!ALL.id.b.num)?'Preencham o nome e o número dos dois alunos na página Trilhos.':null,
+  build:()=>({equipa:nn(),alunos:[{num:String(ALL.id.a.num).trim(),nome:ALL.id.a.nome.trim()},{num:String(ALL.id.b.num).trim(),nome:ALL.id.b.nome.trim()}],labs:Object.keys(LABS).map(plLab),relatorio:report()})})}
+function renderReport(){$('#view').innerHTML=`<section class="narrow"><div id="plbox"></div><h2>Relatório</h2><p class="lead">Inclui a identificação, o estado das fases, as missões, a avaria, as respostas e o registo de ações e comandos.</p><div class="row"><button id="rcopy">Copiar relatório</button><button class="ghost" id="rdl">Descarregar (.txt)</button><span id="rmsg" class="small"></span></div><pre class="rep" id="rep"></pre></section>`;$('#rep').textContent=report();plMount();
   $('#rcopy').onclick=async()=>{try{await navigator.clipboard.writeText(report());$('#rmsg').textContent='Copiado.'}catch(e){const r=document.createRange();r.selectNodeContents($('#rep'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('#rmsg').textContent='Selecionado: usem Ctrl+C.'}};
   $('#rdl').onclick=()=>{try{const u=URL.createObjectURL(new Blob([report()],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download=`relatorio-trilhos-eq${nn()}-${([ALL.id.a.num,ALL.id.b.num].filter(Boolean).join('-').replace(/[^\w-]+/g,'')||'alunos')}.txt`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);$('#rmsg').textContent='Se a transferência não começar, usem «Copiar relatório».'}catch(e){$('#rmsg').textContent='Transferência bloqueada: usem «Copiar relatório».'}}}
 

@@ -185,14 +185,16 @@ td.fb{font-size:14px}
 
 <section data-v="inicio">
   <h2>Laboratórios de SO sem máquinas virtuais</h2>
-  <p class="lead">Cada equipa trabalha aqui num computador simulado: entra no firmware, planeia e arranca máquinas virtuais e usa terminais Ubuntu e Windows. Nada é instalado no PC da escola. 10.º TDS · UC02829.</p>
+  <p class="lead">Cada equipa trabalha aqui num computador simulado: entra no firmware, planeia e arranca máquinas virtuais e usa terminais Ubuntu e Windows. Nada é instalado no PC da escola. UC02829.</p>
   <div class="grid2" style="margin-top:20px">
     <div class="card">
       <h3 style="margin-top:0">A vossa equipa</h3>
       <label for="nA">Nome do aluno A</label><input type="text" id="nA" autocomplete="off">
+      <label for="uA">N.º do aluno A</label><input type="text" id="uA" inputmode="numeric" autocomplete="off" style="max-width:8em">
       <label for="nB">Nome do aluno B</label><input type="text" id="nB" autocomplete="off">
+      <label for="uB">N.º do aluno B</label><input type="text" id="uB" inputmode="numeric" autocomplete="off" style="max-width:8em">
       <label for="tsel">Equipa</label><select id="tsel"></select>
-      <p class="small" style="margin-top:12px">O progresso fica guardado neste navegador. No fim, abram o separador Relatório, copiem o texto e entreguem-no à professora.</p>
+      <p class="small" style="margin-top:12px">O progresso fica guardado neste navegador. No fim, abram o separador Relatório, descarreguem o ficheiro de entrega e enviem-no à professora.</p>
     </div>
     <div class="zone">
       <h3 style="margin-top:0">Como funciona</h3>
@@ -299,14 +301,74 @@ td.fb{font-size:14px}
 </section>
 
 <section data-v="relatorio">
+  <div id="plbox"></div>
   <h2>Relatório da equipa</h2>
-  <p class="lead">Copiem este texto para o documento de entrega. Inclui respostas, verificações, evidências do firmware e da VM, missões concluídas e os últimos comandos.</p>
+  <p class="lead">Este texto vai incluído no ficheiro de entrega; também o podem copiar. Inclui respostas, verificações, evidências do firmware e da VM, missões concluídas e os últimos comandos.</p>
   <div class="row" style="margin-bottom:12px"><button id="rcopy">Copiar relatório</button><span id="rmsg" class="small"></span><button class="ghost" id="rreset">Apagar todo o progresso da equipa</button></div>
   <div class="report" id="rep" tabindex="0"></div>
 </section>
 </main>
 
 <script>
+/* ===== ProgLab · entrega à professora (comum a todas as plataformas) =====
+   Sem servidor: gera um ficheiro .json que os alunos entregam (Classroom, Teams, pen).
+   O código de turma e os prazos ficam guardados neste navegador e são partilhados
+   por todas as páginas do mesmo site. */
+const PL=(()=>{
+  const ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',SK='proglab-turma-v1';
+  const clean=c=>String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const chk=s=>{let t=0;for(let i=0;i<s.length;i++)t+=(ABC.indexOf(s[i])+1)*(i+3);return ABC[t%32]};
+  const valid=c=>{const s=clean(c);return s.length===6&&[...s].every(x=>ABC.includes(x))&&chk(s.slice(0,5))===s[5]};
+  const fmt=c=>{const s=clean(c);return s.length>3?s.slice(0,3)+'-'+s.slice(3):s};
+  const cyrb=(str,seed=0)=>{let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0;i<str.length;i++){const ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return(h2>>>0).toString(16).padStart(8,'0')+(h1>>>0).toString(16).padStart(8,'0')};
+  const seal=(o,code)=>cyrb(JSON.stringify(o)+'|'+clean(code),0x50524f47);
+  let st={code:'',prazos:{}};
+  try{const r=JSON.parse(localStorage.getItem(SK)||'null');if(r)st={code:r.code||'',prazos:r.prazos||{}}}catch(e){}
+  const keep=()=>{try{localStorage.setItem(SK,JSON.stringify(st))}catch(e){}};
+  /* ligação da professora: ?turma=ABC-DEF&p=W5.2026-12-10~L5.2027-01-15 */
+  try{const q=new URLSearchParams(location.search);const t=q.get('turma');
+    if(t&&valid(t)){if(clean(t)!==clean(st.code))st.prazos={};st.code=fmt(t)}
+    const p=q.get('p');if(p&&t&&valid(t)){st.prazos={};p.split('~').forEach(x=>{const m=x.match(/^([A-Za-z0-9-]+)\.(\d{4}-\d{2}-\d{2})$/);if(m)st.prazos[m[1].toUpperCase()]=m[2]})}
+    if(t)keep()}catch(e){}
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const dpt=d=>{const[y,m,dd]=d.split('-');return `${dd}/${m}/${y}`};
+  const css=`.pl-box{border:2px solid #11161d;border-radius:12px;padding:16px 18px;margin:0 0 20px;background:#fff;color:#11161d;font:inherit;max-width:820px}
+.pl-box h3{margin:0 0 4px;font-size:1.1rem}.pl-box p{margin:6px 0}.pl-box .pl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+.pl-box input{font:inherit;font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 10px;border:1.5px solid #5b6470;border-radius:8px;width:9.5em}
+.pl-box button{font:inherit;font-weight:700;padding:9px 16px;border-radius:8px;border:0;background:#11161d;color:#fff;cursor:pointer}
+.pl-box button:disabled{opacity:.45;cursor:not-allowed}.pl-box .pl-ok{color:#0b7a3b;font-weight:600}.pl-box .pl-bad{color:#b3261e;font-weight:600}
+.pl-box .pl-msg{min-height:1.3em}.pl-box ul{margin:6px 0 0;padding-left:20px}.pl-box .pl-late{color:#b3261e;font-weight:600}.pl-box small{color:#5b6470}`;
+  function panel(el,cfg){
+    if(!document.getElementById('pl-css')){const s=document.createElement('style');s.id='pl-css';s.textContent=css;document.head.append(s)}
+    const draw=()=>{
+      const ok=valid(st.code);const ids=cfg.labIds();const today=new Date().toISOString().slice(0,10);
+      const pz=ids.filter(id=>st.prazos[id]).map(id=>`<li>${esc(cfg.labName(id))}: até ${dpt(st.prazos[id])}${st.prazos[id]<today?' <span class="pl-late">(prazo ultrapassado)</span>':''}</li>`).join('');
+      el.innerHTML=`<div class="pl-box" role="region" aria-label="Entrega à professora"><h3>Entregar à professora</h3>
+<p>Descarreguem o ficheiro de entrega e enviem-no à professora pelo canal combinado (Classroom, Teams ou pen). Podem entregar várias vezes: fica a versão mais recente.</p>
+<div class="pl-row"><label for="pl-code"><b>Código de turma</b></label><input id="pl-code" value="${esc(st.code)}" maxlength="7" autocomplete="off" spellcheck="false" placeholder="ABC-DEF"><span id="pl-cs" class="${ok?'pl-ok':st.code?'pl-bad':''}">${ok?'Código válido':st.code?'Código inválido: confirmem com a professora':''}</span></div>
+${pz?`<p style="margin-top:10px"><b>Prazos</b></p><ul>${pz}</ul>`:''}
+<div class="pl-row"><button id="pl-dl" ${ok?'':'disabled'}>Descarregar ficheiro de entrega</button><span class="pl-msg" id="pl-msg"></span></div>
+<p><small>O ficheiro tem os vossos nomes, números e o trabalho feito nesta página. Não é enviado para nenhum servidor.</small></p></div>`;
+      const inp=el.querySelector('#pl-code');
+      inp.oninput=()=>{const v=fmt(inp.value);if(clean(v)!==clean(st.code))st.prazos={};st.code=v;keep();const cs=el.querySelector('#pl-cs');const k=valid(v);cs.className=k?'pl-ok':v?'pl-bad':'';cs.textContent=k?'Código válido':clean(v).length<6?'':'Código inválido: confirmem com a professora';el.querySelector('#pl-dl').disabled=!k;cfg.onCode&&cfg.onCode(st.code)};
+      inp.onblur=()=>{inp.value=st.code};
+      el.querySelector('#pl-dl').onclick=()=>{const msg=el.querySelector('#pl-msg');const prob=cfg.check?cfg.check():null;if(prob){msg.className='pl-msg pl-bad';msg.textContent=prob;return}
+        const b=cfg.build();const body={formato:'proglab-entrega',versao:1,disciplina:cfg.disciplina,plataforma:cfg.plataforma,app:cfg.app,turma:fmt(st.code),equipa:b.equipa,alunos:b.alunos,geradoEm:new Date().toISOString(),labs:b.labs.filter(l=>l.estado!=='por_iniciar'),relatorio:b.relatorio||''};
+        if(!body.labs.length){msg.className='pl-msg pl-bad';msg.textContent='Ainda não há trabalho para entregar nesta página.';return}
+        const file={...body,selo:seal(body,st.code)};
+        const nums=b.alunos.map(a=>a.num).filter(Boolean).join('-').replace(/[^\w-]+/g,'')||'alunos';
+        const name=`entrega-${cfg.disciplina}-${cfg.app}-eq${b.equipa}-${nums}-${body.geradoEm.slice(0,10)}.json`;
+        try{const u=URL.createObjectURL(new Blob([JSON.stringify(file,null,1)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);
+          msg.className='pl-msg pl-ok';msg.textContent=`Ficheiro «${name}» criado com ${body.labs.length} laboratório${body.labs.length>1?'s':''}. Enviem-no à professora.`}catch(e){msg.className='pl-msg pl-bad';msg.textContent='O navegador bloqueou a transferência. Experimentem outro navegador.'}};
+    };
+    draw();return{redraw:draw}}
+  /* utilitários para os adaptadores */
+  const errs=tx=>(tx||[]).filter(o=>o&&o.e).length;
+  const qscore=(n,ans,att)=>{let s=0;for(let j=0;j<n;j++)if(ans[j]===0)s+=att&&att[j]?0.5:1;return n?s/n:0};
+  const gen=()=>{const a=new Uint32Array(5);crypto.getRandomValues(a);let s='';a.forEach(x=>s+=ABC[x%32]);return fmt(s+chk(s))};
+  return{panel,valid,fmt,gen,clean,cyrb,code:()=>st.code,setCode:c=>{const v=fmt(c);if(clean(v)!==clean(st.code))st.prazos={};st.code=v;keep()},prazos:()=>st.prazos,errs,qscore,seal}
+})();
+
 {
 /* ---------- dados das equipas (fichas UC02829, Lab 01 e Lab 02) ---------- */
 const TEAMS=[
@@ -337,7 +399,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(ALL))}catch(e){}}
 let saveT;function later(){clearTimeout(saveT);saveT=setTimeout(save,300)}
 function T(){return TEAMS[ALL.cur]}
 function nn(){return String(ALL.cur+1).padStart(2,'0')}
-function useTeam(i){ALL.cur=i;if(!ALL.teams[i])ALL.teams[i]=blank();S=ALL.teams[i];if(!S.lx)S.lx=lxInit();if(!S.wx)S.wx=wxInit();if(!S.l3)S.l3=l3Init();if(!S.l1.fw)S.l1.fw=fwInit();if(S.l2.hostVirt===null)S.l2.hostVirt=T().host.virt}
+function useTeam(i){ALL.cur=i;if(!ALL.teams[i])ALL.teams[i]=blank();S=ALL.teams[i];if(!S.lx)S.lx=lxInit();if(!S.wx)S.wx=wxInit();if(!S.l3)S.l3=l3Init();if(!S.l1.fw)S.l1.fw=fwInit();if(S.l2.hostVirt===null)S.l2.hostVirt=T().host.virt;if(!S.nums)S.nums={a:'',b:''}}
 function now(){return new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'})}
 
 /* ---------- início ---------- */
@@ -345,7 +407,7 @@ function teamLabel(i){const t=TEAMS[i];return `Equipa ${String(i+1).padStart(2,'
 function renderStart(){
   $('#team').innerHTML=$('#tsel').innerHTML=TEAMS.map((t,i)=>`<option value="${i}">${esc(teamLabel(i))}</option>`).join('');
   $('#team').value=$('#tsel').value=ALL.cur;
-  $('#nA').value=S.names.a;$('#nB').value=S.names.b;
+  $('#nA').value=S.names.a;$('#nB').value=S.names.b;$('#uA').value=S.nums.a;$('#uB').value=S.nums.b;
   $('#teams').innerHTML=TEAMS.map((t,i)=>`<div class="card"${i===ALL.cur?' style="border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)"':''}><h3>Equipa ${String(i+1).padStart(2,'0')}</h3><p style="margin:0 0 6px"><b>Lab 01 · ${esc(t.pc.id)}</b> ${esc(t.pc.nome)}</p><p class="small" style="margin:0 0 10px">${esc(t.pc.dados)}</p><p style="margin:0 0 6px"><b>Lab 02 · ${esc(t.host.id)}</b> ${esc(t.host.nome)}</p><p class="small" style="margin:0 0 10px">${t.host.ram} GB RAM · ${t.host.cores} núcleos · SSD livre ${t.host.free} GB</p><p style="margin:0 0 6px"><b>Lab 03 · instalar Ubuntu</b></p><p class="small" style="margin:0">${esc(L3T[i].prob)}</p></div>`).join('');
 }
 
@@ -821,6 +883,7 @@ function makeTerm(el,kind){
     if(e.key==='Enter'){const v=inp.value;const echo=document.createElement('div');echo.append(promptEl());echo.append(document.createTextNode(v));el.insertBefore(echo,inRow);inp.value='';hi=-1;
       if(v.trim()){s.hist.push(v);if(s.hist.length>200)s.hist.shift();}
       const r=isL?lxRun(s,v):wxRun(s,v);
+      r.out.forEach(o=>{if(o&&o.e)s.errs=(s.errs||0)+1});
       if(v.trim()){splitTop(v,/^(&&|;)/).forEach(x=>{x=x.trim().replace(/^sudo\s+/,'');if(x)s.log.push(x)});if(s.log.length>400)s.log.splice(0,s.log.length-400)}
       if(r.out.some(o=>o&&o.clear)){reset();return after()}
       r.out.forEach(line);draw();after();el.scrollTop=el.scrollHeight;inp.focus()}
@@ -839,7 +902,7 @@ let LT,WT;
 /* ---------- relatório ---------- */
 function report(){
   const t=T(),L=[];const A=s=>L.push(s);
-  A(`BANCADA DE SISTEMAS OPERATIVOS · 10.º TDS · UC02829`);A(`Equipa ${nn()} · ${S.names.a||'(aluno A)'} e ${S.names.b||'(aluno B)'}`);A(`Gerado em ${new Date().toLocaleString('pt-PT')}`);A('');
+  A(`BANCADA DE SISTEMAS OPERATIVOS · UC02829`);A(`Equipa ${nn()} · ${S.names.a||'(aluno A)'} e ${S.names.b||'(aluno B)'}`);A(`Gerado em ${new Date().toLocaleString('pt-PT')}`);A('');
   A(`== LAB 01 · ${t.pc.id} — ${t.pc.nome} ==`);A(`Equipamento: ${t.pc.dados}`);
   A(`Verificado no firmware: ${Object.keys(REVK).filter(k=>S.l1.rev[k]).map(k=>REVK[k]).join(', ')||'nada'}`);
   if(S.l1.rev.hw)A(`  Processador ${t.pc.cpu}, ${t.pc.cores} núcleos, ${t.pc.ram} GB RAM, ${t.pc.disk}`);
@@ -868,7 +931,33 @@ function report(){
   A('');A(`== TERMINAL WINDOWS · ${wd.filter(Boolean).length}/${wd.length} missões ==`);WXM().forEach((m,i)=>A(`  [${wd[i]?'x':' '}] ${m.t}`));A('Últimos comandos:');S.wx.hist.slice(-25).forEach(h=>A('  > '+h));
   return L.join('\n');
 }
-function renderReport(){$('#rep').textContent=report()}
+function renderReport(){$('#rep').textContent=report();PLP&&PLP.redraw()}
+/* ---------- entrega à professora ---------- */
+const BLABS={LAB01:'Lab 01 · Interpretar o equipamento',LAB02:'Lab 02 · Planear e criar a máquina virtual',LAB03:'Lab 03 · Instalar o Ubuntu',BUBU:'Bancada · Terminal Ubuntu',BWIN:'Bancada · Terminal Windows'};
+const wn=t=>String(t||'').trim().split(/\s+/).filter(Boolean).length;
+function ansPart(Q,ans){const a=Q.map(([k,q])=>({p:q,r:ans[k]||''}));return{respostas:a,comp:{nome:'Respostas escritas completas',valor:a.length?a.filter(x=>x.r.trim().length>20).length/a.length:0,detalhe:`${a.filter(x=>x.r.trim().length>20).length}/${a.length}`},any:a.some(x=>x.r.trim())}}
+function plLabs(){const L=[];
+  {const l=S.l1,ap=ansPart(L1Q(),l.ans),rk=Object.keys(REVK),rv=rk.filter(k=>l.rev[k]).length,[ok,n]=(l.score||'0/10').split('/').map(Number);const done=!!l.score&&ok===n&&L1Q().every(([k])=>(l.ans[k]||'').trim().length>20);
+   L.push({id:'LAB01',titulo:BLABS.LAB01,estado:done?'concluido':(rv||l.log.length||Object.keys(l.tab).length||ap.any)?'em_curso':'por_iniciar',
+    componentes:[{nome:'Verificações no firmware',valor:rv/rk.length,detalhe:`${rv}/${rk.length}`},{nome:'Tabela de requisitos',valor:l.score?ok/n:0,detalhe:l.score||'não verificada'},ap.comp],
+    missoes:rk.map(k=>({t:'Verificar no firmware: '+REVK[k],ok:!!l.rev[k]})),respostas:ap.respostas,acoes:l.log.slice(),tentativas:l.tries||0,errosComando:0,comandos:[]})}
+  {const l=S.l2,ap=ansPart(L2Q(),l.ans),run=l.vms.some(v=>v.run),bad=l.vms.filter((v,i)=>validate({...v,idx:i}).some(m=>m[0]==='erro')).length;const done=run&&L2Q().every(([k])=>(l.ans[k]||'').trim().length>20);
+   L.push({id:'LAB02',titulo:BLABS.LAB02,estado:done?'concluido':(l.vms.length||ap.any)?'em_curso':'por_iniciar',
+    componentes:[{nome:'VM criada e arrancada',valor:run?1:0,detalhe:run?'sim':'não'},{nome:'VM sem erros de configuração',valor:l.vms.length?(l.vms.length-bad)/l.vms.length:0,detalhe:`${l.vms.length-bad}/${l.vms.length} VM`},ap.comp],
+    missoes:[{t:'Criar a VM com as definições do cenário',ok:l.vms.length>0},{t:'Arrancar a VM a partir da ISO',ok:run}],respostas:ap.respostas,acoes:l.log.slice(),tentativas:l.vms.length,errosComando:0,comandos:[]})}
+  {const l=S.l3,ap=ansPart(L3Q(),l.ans),rq=l3Reqs(),ok=rq.filter(x=>x[1]).length;const done=rq.every(x=>x[1])&&L3Q().every(([k])=>(l.ans[k]||'').trim().length>20);
+   L.push({id:'LAB03',titulo:BLABS.LAB03,estado:done?'concluido':(l.step!=='off'||ap.any)?'em_curso':'por_iniciar',
+    componentes:[{nome:'Requisitos do cliente cumpridos',valor:rq.length?ok/rq.length:0,detalhe:`${ok}/${rq.length}`},ap.comp],
+    missoes:rq.map(([t,y])=>({t,ok:!!y})),respostas:ap.respostas,acoes:(l.log||[]).slice(),tentativas:0,errosComando:0,comandos:[]})}
+  [['BUBU',S.lx,LXM()],['BWIN',S.wx,WXM()]].forEach(([id,m,M])=>{const d=misDone(M),k=d.filter(Boolean).length;
+   L.push({id,titulo:BLABS[id],estado:d.every(Boolean)?'concluido':m.hist.length?'em_curso':'por_iniciar',
+    componentes:[{nome:'Missões do terminal',valor:M.length?k/M.length:0,detalhe:`${k}/${M.length}`}],
+    missoes:M.map((x,i)=>({t:x.t,ok:d[i]})),respostas:[],acoes:[],comandos:m.hist.map(c=>({onde:id==='BUBU'?'Ubuntu':'Windows',c})),tentativas:m.hist.length,errosComando:m.errs||0})});
+  return L}
+let PLP=null;
+function plMount(){PLP=PL.panel($('#plbox'),{disciplina:'SO',plataforma:'SO Lab · Bancada',app:'bancada',labIds:()=>Object.keys(BLABS),labName:id=>BLABS[id]||id,
+  check:()=>(!String(S.nums.a).trim()||!String(S.nums.b).trim())?'Preencham o nome e o número dos dois alunos na página Início.':null,
+  build:()=>({equipa:nn(),alunos:[{num:String(S.nums.a).trim(),nome:S.names.a.trim()},{num:String(S.nums.b).trim(),nome:S.names.b.trim()}],labs:plLabs(),relatorio:report()})})}
 $('#rcopy').onclick=async()=>{const txt=report();try{await navigator.clipboard.writeText(txt);$('#rmsg').textContent='Copiado. Colem no documento de entrega.'}catch(e){const r=document.createRange();r.selectNodeContents($('#rep'));const s=window.getSelection();s.removeAllRanges();s.addRange(r);$('#rmsg').textContent='Texto selecionado: usem Ctrl+C.'}};
 $('#rreset').onclick=()=>{const b=$('#rreset');if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Confirmar: apagar tudo desta equipa';setTimeout(()=>{b.dataset.c='';b.textContent='Apagar todo o progresso da equipa'},4000);return}ALL.teams[ALL.cur]=blank();useTeam(ALL.cur);b.dataset.c='';b.textContent='Apagar todo o progresso da equipa';form=null;renderAll();save()};
 
@@ -885,7 +974,7 @@ function route(){const v=VIEWS.includes(location.hash.slice(1))?location.hash.sl
 function renderAll(){clearInterval(instTimer);instTimer=null;if(S.l3.step==='installing')S.l3.step='review';renderStart();renderLab1();renderLab2();renderLab3();LT.reset();WT.reset();renderMis('#lxm','#lxp',LXM());renderMis('#wxm','#wxp',WXM());dots();route()}
 function switchTeam(i){useTeam(+i);form=null;renderAll();save()}
 $('#team').onchange=e=>switchTeam(e.target.value);$('#tsel').onchange=e=>switchTeam(e.target.value);
-$('#nA').oninput=e=>{S.names.a=e.target.value;later()};$('#nB').oninput=e=>{S.names.b=e.target.value;later()};
+$('#nA').oninput=e=>{S.names.a=e.target.value;later()};$('#nB').oninput=e=>{S.names.b=e.target.value;later()};$('#uA').oninput=e=>{S.nums.a=e.target.value;later()};$('#uB').oninput=e=>{S.nums.b=e.target.value;later()};
 $('#l1auth').onchange=()=>renderFW();$('#l1check').onclick=checkTab;
 $('#lxreset').onclick=()=>{S.lx=lxInit();LT.reset();renderMis('#lxm','#lxp',LXM());dots();later()};
 $('#wxreset').onclick=()=>{S.wx=wxInit();WT.reset();renderMis('#wxm','#wxp',WXM());dots();later()};
@@ -895,7 +984,7 @@ function start(data){
   try{const raw=data&&data.teams?data:JSON.parse(localStorage.getItem(KEY)||'null');if(raw&&raw.teams)ALL=raw}catch(e){}
   useTeam(ALL.cur||0);
   LT=makeTerm($('#lxt'),'lx');WT=makeTerm($('#wxt'),'wx');
-  renderAll();
+  plMount();renderAll();
 }
 window.claude?.hot?.snapshot?.(()=>ALL);
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??null);

@@ -57,4 +57,4 @@ docs/img/               Capturas e imagem de capa
 - **Requisitos oficiais:** a correção do Lab 01 segue as páginas da [Microsoft](https://learn.microsoft.com/windows/whats-new/windows-11-requirements) e do [Ubuntu](https://help.ubuntu.com/community/Installation/SystemRequirements). Reveja-as no início de cada ano letivo.
 - **Licença:** escolha uma antes de tornar o repositório público (por exemplo, CC BY-SA 4.0) e acrescente o ficheiro `LICENSE`.
 
-Autoria: A. S. P. Silva
+Autoria: Alexandra Silva @ 2026

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SO Lab · Trilhos</title>
+<meta name="description" content="SO Lab · Trilhos: laboratórios de Sistemas Operativos com dois trilhos, Windows 11 e Ubuntu, em máquinas simuladas no navegador.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday learning product, clear and confident
+   IDEA two metro lines (Windows blue, Ubuntu orange) and, inside each lab, the real machine of that line
+   PICTURE the simulated machine itself: a Windows 11 desktop with windows, or an Ubuntu terminal
+   COLOUR white ground, near-black ink, track colour --tc leads each lab (Windows #0a5cff, Ubuntu #e95420), green done, amber "here"
+   TYPE Figtree 800 titles, Figtree text, JetBrains Mono for terminals
+   LAYOUT top bar; phase stepper; missions left, machine right; phone stacks missions, machine */
+:root{color-scheme:light dark;--bg:light-dark(#fff,#0e1116);--ink:light-dark(#11161d,#e8edf3);--mut:light-dark(#4f5b6b,#a5b0bf);--zone:light-dark(#f2f4f7,#171c24);--line:light-dark(#d6dbe2,#2a313c);--panel:light-dark(#fff,#141922);--good:light-dark(#00874c,#2fd38a);--bad:light-dark(#c4291f,#ff7b72);--amb:#ffb400;--tc:#11161d}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,h4{line-height:1.1;letter-spacing:-.02em;margin:0 0 .4em}h1{font-size:clamp(30px,4.5vw,46px);font-weight:800;text-wrap:balance}h2{font-size:clamp(26px,3.6vw,38px);font-weight:800;text-wrap:balance}h3{font-size:19px;font-weight:800}h4{font-size:15px;margin:.8em 0 .3em}
+p{margin:0 0 .7em}a{color:var(--tc)}
+code{font-family:"JetBrains Mono",monospace;font-size:.86em;background:var(--zone);padding:1px 6px;border-radius:5px;overflow-wrap:anywhere}
+.small{font-size:14px;color:var(--mut)}.lead{font-size:17px;color:var(--mut);max-width:70ch}
+.top{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;justify-content:space-between;padding:12px max(4vw,16px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}.brand b{font-size:22px;font-weight:800;letter-spacing:-.03em}.brand span{font-size:14px;color:var(--mut)}
+.topnav{display:flex;gap:4px;flex-wrap:wrap}.topnav a{padding:9px 14px;border-radius:9px;text-decoration:none;color:var(--ink);font-weight:600}.topnav a.on{background:var(--zone)}
+main{max-width:1320px;margin:0 auto;padding:clamp(18px,3vw,34px) max(4vw,16px) 56px}
+button{font:600 15px Figtree,sans-serif;min-height:44px;padding:0 16px;border-radius:9px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}button:disabled{opacity:.45;cursor:not-allowed}
+input,select,textarea{font:16px Figtree,sans-serif;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:44px}
+textarea{width:100%;min-height:130px;resize:vertical}
+:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
+label.l{display:block;font-weight:600;margin:14px 0 6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chk{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-weight:500}.chk input{width:18px;height:18px;min-height:0;margin-top:3px;flex:none}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600}
+.good{color:var(--good);font-weight:600}.bad{color:var(--bad);font-weight:600}
+/* home */
+.hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;align-items:start;margin-bottom:22px}
+@media(max-width:860px){.hero{grid-template-columns:minmax(0,1fr)}}
+.idf{background:var(--zone);border-radius:14px;padding:16px;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:8px 10px}.idf label{display:flex;flex-direction:column;font-size:14px;font-weight:600;color:var(--mut)}.idf label:nth-child(5),.idf p{grid-column:1/-1}.idf p{margin:0}
+.common{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:12px 0;font-weight:600}.common a.cl{color:var(--ink);text-decoration:none;display:inline-flex;gap:8px;align-items:center}.common a.cl:hover{text-decoration:underline}.cdot{display:inline-grid;place-items:center;min-width:36px;height:30px;border-radius:15px;background:var(--zone);border:2px solid var(--line);font-size:13px;font-weight:800}
+.track{margin:10px 0 18px;--tc:#000}.tname{display:flex;gap:12px;align-items:baseline;margin-bottom:8px}.tname b{font-size:20px;font-weight:800;color:var(--tc)}.tname span{color:var(--mut);font-size:14px}
+.stations{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));position:relative}
+.stations::before{content:"";position:absolute;left:4%;right:4%;top:21px;height:8px;border-radius:4px;background:var(--tc)}
+.stations li{position:relative;text-align:center;padding:0 4px}
+.stations li>a,.stations li>span{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:var(--ink)}
+.stations i{position:relative;display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--bg);border:5px solid var(--tc);font:800 14px Figtree,sans-serif;font-style:normal;color:var(--tc)}
+.stations b{font-size:14px;line-height:1.2;font-weight:600}.stations small{font-size:12px;color:var(--mut)}
+.stations li.act i{box-shadow:0 0 0 5px var(--amb)}.stations li.act a:hover i{transform:scale(1.06)}
+.stations li.done i{background:var(--tc);color:#fff}
+.stations li.soon{opacity:.5}.stations li.else i{border-style:dashed}
+@media(max-width:860px){.stations{grid-template-columns:minmax(0,1fr);gap:6px}.stations::before{left:21px;right:auto;top:8px;bottom:8px;width:8px;height:auto}.stations li{text-align:left}.stations li>a,.stations li>span{flex-direction:row;flex-wrap:wrap;gap:4px 12px}.stations i{width:44px;height:44px;flex:none}.stations small{flex-basis:100%;padding-left:56px;margin-top:-10px}}
+.scen{display:flex;flex-direction:column;gap:4px;background:var(--zone);border-radius:12px;padding:14px 16px;margin-top:12px}
+/* lab */
+.kick{font-weight:600;color:var(--tc)}
+.badge{display:inline-block;background:var(--good);color:#fff;font-size:14px;font-weight:600;padding:3px 10px;border-radius:999px;margin-left:10px;vertical-align:middle;letter-spacing:0}
+.phases{display:flex;gap:6px;overflow-x:auto;margin:16px 0 20px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.phases button{flex:none;background:transparent;color:var(--ink);border:0;border-bottom:4px solid transparent;border-radius:0;display:flex;gap:8px;align-items:center;padding:0 12px}
+.phases button i{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--zone);font-style:normal;font-size:13px}
+.phases button.on{border-bottom-color:var(--tc)}.phases button.ok i{background:var(--good);color:#fff}
+.split{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:24px;align-items:start}
+@media(min-width:1001px){.split>div:last-child{position:sticky;top:10px}}
+@media(max-width:1000px){.split{grid-template-columns:minmax(0,1fr)}}
+.mis{list-style:none;margin:0 0 12px;padding:0;counter-reset:m}
+.mis li{counter-increment:m;border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 46px;margin:0 0 8px;position:relative;background:var(--panel);font-size:15px}
+.mis li::before{content:counter(m);position:absolute;left:11px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--zone);display:grid;place-items:center;font-weight:700;font-size:13px}
+.mis li.done::before{content:"✓";background:var(--good);color:#fff}.mis li.cur{border-color:var(--tc);box-shadow:0 0 0 1px var(--tc)}.mis li.xopt{border-style:dashed}
+.mis b{display:block}.mis details{font-size:14px;color:var(--mut);margin-top:4px}
+.ticket{background:var(--zone);border-left:5px solid var(--amb);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.panel{border-radius:10px;padding:10px 14px;margin:12px 0;border-left:5px solid var(--line);background:var(--zone)}.panel.done{border-color:var(--good)}.panel.todo{border-color:var(--amb)}
+.next{display:flex;justify-content:flex-end;margin-top:22px}
+.narrow{max-width:900px}
+fieldset{border:1px solid var(--line);border-radius:12px;margin:0 0 12px;padding:12px 14px;background:var(--panel)}legend{float:left;width:100%;padding:0;margin-bottom:6px;font-weight:600}legend+*{clear:both}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-radius:8px;cursor:pointer}.opt:hover{background:var(--zone)}.opt input{width:20px;height:20px;min-height:0;margin-top:2px;flex:none;accent-color:var(--tc)}
+.fb{font-size:14px;margin:6px 0 0}
+.learn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media(max-width:860px){.learn{grid-template-columns:minmax(0,1fr)}}
+.lcard{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--panel)}.lcard.wide{grid-column:1/-1;border-color:var(--tc);border-width:2px}
+.lcard ul{padding-left:20px;margin:6px 0}.anat{font:14px "JetBrains Mono",monospace;background:#0b0f14;color:#d6e2ee;padding:10px 12px;border-radius:8px;overflow-x:auto}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px}@media(max-width:700px){.calc{grid-template-columns:minmax(0,1fr)}}
+.pres{padding:8px 0;border-bottom:1px solid var(--line)}.pres div{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
+.rwx td,.rwx th{text-align:center}.rwx input{width:22px;height:22px;min-height:0}.big{font-size:20px}
+table.cmp th.cw{color:#0a5cff}table.cmp th.cl{color:#e95420}
+.rep{white-space:pre-wrap;font:13px/1.5 "JetBrains Mono",monospace;background:var(--zone);border-radius:10px;padding:14px;max-height:65vh;overflow:auto}
+/* terminais */
+.term{background:#300a24;color:#eeeeec;font:14px/1.45 "JetBrains Mono",monospace;border-radius:12px;padding:12px 14px;height:min(68vh,580px);overflow-y:auto;cursor:text;white-space:pre-wrap;overflow-wrap:anywhere}
+.term.pst{background:#012456;color:#eeedf0;border-radius:0;height:100%}
+.term .er{color:#ff9b93}.term .pu{color:#8ae234;font-weight:600}.term .pp{color:#729fcf;font-weight:600}.term .pw{color:#eeedf0}
+.tin{display:flex}.term input{flex:1;background:transparent;border:0;color:inherit;font:inherit;padding:0;min-height:0;outline:none;caret-color:var(--amb);border-radius:0}.term input:focus-visible{outline:none}
+/* Windows simulado */
+.envbox.win{border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.wdesk{position:relative;height:min(72vh,620px);min-height:480px;background:radial-gradient(120% 90% at 70% 10%,#6fa8ff,#1d5bd6 45%,#0a2d75);font:14px/1.45 "Segoe UI",Figtree,system-ui,sans-serif;color:#1b1b1b;display:flex;flex-direction:column;padding:10px 10px 0}
+.wdesk button{font:14px "Segoe UI",Figtree,sans-serif;min-height:34px;padding:0 12px;border-radius:5px;border:1px solid #c8c8c8;background:#fbfbfb;color:#1b1b1b}
+.wdesk button:hover{background:#f0f0f0;filter:none}
+.wdesk input,.wdesk select{font:14px "Segoe UI",Figtree,sans-serif;min-height:34px;padding:4px 8px;border:1px solid #c8c8c8;border-radius:5px;background:#fff;color:#1b1b1b;width:100%}
+.wdesk label{display:block;margin:6px 0;color:#1b1b1b}.wdesk .chk{display:flex}.wdesk .small{color:#5c5c5c}
+.wempty{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.wwin{flex:1;background:#f3f3f3;border-radius:8px 8px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.wtb{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 4px 12px;background:#eaeaea;font-size:13px;gap:8px}.wtb span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wx{display:flex;flex:none}.wx button{border:0;background:transparent;min-height:30px;width:40px;padding:0;border-radius:4px}.wx button:last-child:hover{background:#e81123;color:#fff}
+.wbody{flex:1;overflow:auto;background:#fff;display:flex;flex-direction:column}
+.wcm{display:grid;grid-template-columns:200px minmax(0,1fr);flex:1}@media(max-width:600px){.wcm{grid-template-columns:minmax(0,1fr)}.wtree{flex-direction:row;flex-wrap:wrap;align-items:center}.wtree b,.wtree div{display:none}.wtree button{padding-left:12px}}
+.wtree{background:#f7f7f7;border-right:1px solid #e3e3e3;padding:10px;display:flex;flex-direction:column;gap:4px;font-size:13px}.wtree button{text-align:left;border:0;background:transparent;padding-left:22px}.wtree button.on{background:#dbe8fb}
+.wlist{padding:8px;display:flex;flex-direction:column;gap:8px}.wtool{display:flex;flex-wrap:wrap;gap:6px}
+table.wt{font-size:13px}table.wt th{color:#5c5c5c;font-weight:600;background:#fafafa}table.wt td,table.wt th{border-color:#ececec;padding:5px 8px}
+table.wt tr[data-a]{cursor:pointer}table.wt tr.sel td{background:#cce4ff}table.wt tr[data-a]:hover td{background:#e8f1fd}
+.wex{padding:8px;display:flex;flex-direction:column;gap:8px;flex:1}.waddr{display:flex;gap:8px;align-items:center;background:#f7f7f7;border:1px solid #e3e3e3;border-radius:5px;padding:2px 8px;font-size:13px}.waddr button{min-height:28px;width:30px;padding:0;border:0;background:transparent}
+.wicons{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;align-content:start}
+.wic{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:1px solid transparent !important;background:transparent !important;border-radius:6px;font-size:13px;text-align:center;overflow-wrap:anywhere;min-height:0 !important;height:auto}
+.wic.sel{background:#cce4ff !important;border-color:#99c9ff !important}.wic.file{cursor:default}
+.fold{width:46px;height:36px;border-radius:3px 6px 4px 4px;background:linear-gradient(#ffd75e,#f2b630);position:relative}.fold::before{content:"";position:absolute;left:0;top:-5px;width:20px;height:8px;border-radius:3px 3px 0 0;background:#e9a91c}
+.doc{width:30px;height:38px;border-radius:2px;background:#fff;border:1px solid #c5c5c5;box-shadow:inset 0 6px 0 #e9eef5}
+.wtask{display:flex;align-items:center;gap:4px;height:48px;margin:0 -10px;padding:0 10px;background:rgba(243,243,243,.86);backdrop-filter:blur(10px);justify-content:center;position:relative}
+.wtask .wstart{width:44px;padding:0;border:0;background:transparent}.wstart span{display:block;width:20px;height:20px;margin:auto;border-radius:5px;background:conic-gradient(#3a96dd 0 25%,#1d6fc2 0 50%,#3a96dd 0 75%,#1d6fc2 0)}
+.wtapp{display:flex;flex-direction:column;align-items:center;gap:1px;border:0 !important;background:transparent !important;padding:2px 8px !important;position:relative}.wtapp i{width:20px;height:20px;border-radius:5px;display:block}.wtapp em{font-style:normal;font-size:11px}
+.wtapp.run::after{content:"";position:absolute;bottom:1px;left:40%;right:40%;height:3px;border-radius:2px;background:#8a8a8a}.wtapp.on::after{background:#1d6fc2;left:30%;right:30%}
+.wsess{position:absolute;right:12px;font-size:12px;color:#333}
+.wmenu{position:absolute;left:50%;transform:translateX(-50%);bottom:56px;width:min(340px,92%);background:#f3f3f3;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:14px;display:flex;flex-direction:column;gap:6px;z-index:3}.wmenu button{text-align:left;border:0;background:transparent}.wmenu button:hover{background:#e5e5e5}.wmenu hr{border:0;border-top:1px solid #ddd;width:100%}
+.wov{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:12px;z-index:5}
+.wdlg{background:#f3f3f3;border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.4);width:min(520px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden}
+.wdb{padding:12px 14px;overflow:auto;background:#fff}.wdf{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;background:#f3f3f3}.wdf button:first-child{background:#0067c0;color:#fff;border-color:#0067c0}
+.wdlg .msg{padding:8px 10px;border-radius:5px;margin-top:8px;background:#fde7e9;border-left:4px solid #c42b1c;color:#1b1b1b}
+.uac{border-top:6px solid #0067c0}.uach{background:#0067c0;color:#fff;padding:8px 14px;font-size:13px}
+.wtabs{border-bottom:1px solid #ddd;margin-bottom:8px}.wtabs span{display:inline-block;padding:4px 10px;border-bottom:2px solid #0067c0;font-weight:600}
+.wpr{list-style:none;margin:4px 0 8px;padding:0;border:1px solid #ddd;border-radius:4px;max-height:120px;overflow:auto}.wpr button{width:100%;text-align:left;border:0;border-radius:0;background:#fff;min-height:28px}.wpr button.sel{background:#cce4ff}
+table.perm td:nth-child(n+2),table.perm th:nth-child(n+2){text-align:center;width:70px}table.perm input{width:16px;height:16px;min-height:0}
+.wml{list-style:none;padding:0;margin:4px 0 8px}.wml li{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #eee}.wml button{min-height:28px}
+.wps{flex:1;display:flex;min-height:0}.wps .term{flex:1}
+@media(max-width:600px){.wdesk{height:76vh;min-height:520px}.wtapp em{display:none}.wsess{display:none}}
+</style>
+</head>
+<body>
+<div class="top"><a class="brand" href="#inicio"><svg width="38" height="38" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="11" fill="#11161d"/><path d="M8 28 H20 L26 16 H36" stroke="#0a5cff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M26 16 L30 28 H36" stroke="#e95420" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="28" r="4.5" fill="#fff"/><circle cx="26" cy="16" r="4.5" fill="#ffb400"/></svg><span><b>SO Lab</b> <span>Trilhos</span></span></a>
+<nav class="topnav" aria-label="Navegação"><a href="#inicio">Trilhos</a><a href="#w5">W5 · Windows</a><a href="#l5">L5 · Ubuntu</a><a href="#relatorio">Relatório</a><a href="bancada/index.html">Bancada</a><a href="revisao/index.html">Revisão</a></nav></div>
+<main id="view"></main>
+<script>
+{
+/* ===== Cenários das equipas ===== */
+const TEAMS=[
+ {emp:'Clínica Sorriso',gA:'rececao',gB:'medicos',lA:'Receção',lB:'Médicos',u:['ana','bruno','carla'],n:['Ana Reis','Bruno Lima','Carla Mota'],fA:'Marcacoes',fB:'Fichas'},
+ {emp:'Oficina Motores',gA:'mecanicos',gB:'escritorio',lA:'Mecânicos',lB:'Escritório',u:['diogo','eva','fabio'],n:['Diogo Paz','Eva Cruz','Fábio Sá'],fA:'Reparacoes',fB:'Faturas'},
+ {emp:'Escola de Música',gA:'professores',gB:'secretaria',lA:'Professores',lB:'Secretaria',u:['gil','helena','ivo'],n:['Gil Rocha','Helena Dias','Ivo Matos'],fA:'Partituras',fB:'Matriculas'},
+ {emp:'Agência Viagens',gA:'agentes',gB:'gestao',lA:'Agentes',lB:'Gestão',u:['joana','luis','marta'],n:['Joana Pires','Luís Costa','Marta Leal'],fA:'Reservas',fB:'Contratos'},
+ {emp:'Ginásio Forma',gA:'treinadores',gB:'rececao',lA:'Treinadores',lB:'Receção',u:['nuno','olga','pedro'],n:['Nuno Faria','Olga Vaz','Pedro Neves'],fA:'Planos',fB:'Socios'},
+ {emp:'Livraria Página',gA:'vendas',gB:'compras',lA:'Vendas',lB:'Compras',u:['rita','sara','tiago'],n:['Rita Gomes','Sara Brito','Tiago Melo'],fA:'Vendas',fB:'Encomendas'},
+ {emp:'Estúdio Design',gA:'designers',gB:'comercial',lA:'Designers',lB:'Comercial',u:['ulisses','vera','xavier'],n:['Ulisses Ramos','Vera Lopes','Xavier Pinto'],fA:'Projetos',fB:'Propostas'},
+ {emp:'Restaurante Mar',gA:'cozinha',gB:'sala',lA:'Cozinha',lB:'Sala',u:['zeca','alice','bento'],n:['Zeca Moura','Alice Teles','Bento Rosa'],fA:'Receitas',fB:'Mesas'}
+];
+/* u[0] = responsável (grupo A, administrador), u[1] = grupo A, u[2] = grupo B */
+
+/* ===== Mapa dos trilhos ===== */
+const TRACKS={
+ w:{name:'Windows 11',col:'#0a5cff',labs:[['W1','Instalar o Windows 11'],['W2','Definições e ambiente de trabalho'],['W3','Dispositivos e controladores'],['W4','Discos e sistemas de ficheiros'],['W5','Contas, UAC e permissões NTFS'],['W6','Partilha de pastas'],['W7','Processos, serviços e arranque'],['W8','Rede e diagnóstico']]},
+ l:{name:'Ubuntu 24.04',col:'#e95420',labs:[['L1','Instalar o Ubuntu'],['L2','Terminal e árvore de diretórios'],['L3','Dispositivos e controladores'],['L4','Discos e sistemas de ficheiros'],['L5','Utilizadores, grupos e permissões'],['L6','Partilha com Samba'],['L7','Processos, serviços e arranque'],['L8','Rede e diagnóstico']]}
+};
+const ACTIVE={W5:'w5',L5:'l5'};
+const ELSEWHERE={L1:['Bancada · Lab 03','bancada/index.html#lab03']};
+
+/* ===== Perguntas ===== */
+const QUIZ={
+ w5:[['Que tipo de conta deve ser usada no trabalho do dia a dia?',['Uma conta padrão, pedindo privilégios só quando é preciso','Uma conta de administrador','A conta Convidado','Uma conta sem palavra-passe'],'Com uma conta padrão, um erro ou um programa malicioso não consegue alterar o sistema sem autorização.'],
+  ['O Controlo de Conta de Utilizador (UAC) serve para…',['pedir confirmação ou credenciais antes de alterações que exigem privilégios de administrador','bloquear vírus automaticamente','cifrar os ficheiros do utilizador','criar cópias de segurança'],'O UAC separa o uso normal das ações administrativas.'],
+  ['Um utilizador pertence a um grupo com «Modificar», mas tem «Negar: Escrita» explícito. O que acontece?',['Não consegue escrever: o Negar prevalece','Consegue escrever, porque o grupo tem Modificar','Fica com Controlo total','Depende do tamanho do ficheiro'],'Uma permissão Negar explícita sobrepõe-se às permissões Permitir.'],
+  ['Por omissão, uma subpasta nova…',['herda as permissões da pasta-mãe','fica sem permissões','só fica acessível ao Administrador','fica partilhada na rede'],'A herança propaga as permissões de cima para baixo.'],
+  ['O que faz «Desativar herança → Converter em permissões explícitas»?',['Copia as permissões herdadas para explícitas, que passam a poder ser editadas','Apaga todas as permissões da pasta','Partilha a pasta na rede','Dá Controlo total a Todos'],'Depois de converter, já podem remover, por exemplo, o grupo Utilizadores.'],
+  ['Qual é a diferença entre «Modificar» e «Controlo total»?',['O Controlo total também permite alterar permissões e tomar posse','São exatamente iguais','O Modificar permite alterar permissões','O Controlo total não permite eliminar'],'Por isso o Controlo total deve ficar só para administradores.']],
+ l5:[['Onde ficam guardadas as contas e os grupos no Ubuntu?',['Em /etc/passwd e /etc/group, com as palavras-passe cifradas em /etc/shadow','Na pasta /home','Em /var/log','Na partição /boot'],'Cada linha de /etc/passwd é um utilizador; cada linha de /etc/group é um grupo.'],
+  ['Qual é o valor octal de rwxr-x---?',['750','755','640','700'],'rwx = 4+2+1 = 7, r-x = 4+1 = 5, --- = 0.'],
+  ['Numa pasta, a permissão x (execução) permite…',['entrar na pasta (cd) e aceder aos ficheiros lá dentro','executar a pasta como um programa','apagar a pasta','só ver os nomes dos ficheiros'],'Sem x, nem um membro do grupo consegue entrar na pasta.'],
+  ['O que faz «usermod -G vendas rita», sem o -a?',['Substitui todos os grupos secundários da rita por vendas','Acrescenta o grupo vendas aos que a rita já tem','Apaga a utilizadora rita','Cria o grupo vendas'],'Para acrescentar sem perder os outros grupos usa-se -aG.'],
+  ['Qual é a diferença entre sudo e su?',['O sudo executa um comando como root com a palavra-passe do próprio utilizador, se estiver autorizado; o su muda de utilizador com a palavra-passe desse utilizador','São exatamente iguais','O su não pede palavra-passe','O sudo serve só para criar utilizadores'],'No Ubuntu, quem pertence ao grupo sudo pode administrar o sistema.'],
+  ['O que faz o setgid numa pasta (chmod g+s)?',['Os ficheiros novos herdam o grupo da pasta','Todos os ficheiros passam a ser do root','A pasta fica oculta','Impede que se apaguem ficheiros'],'É a forma habitual de criar pastas de trabalho em grupo.']]
+};
+
+/* ===== Comparar ===== */
+const COMPARE=[
+ ['Administração do sistema','Grupo Administradores + UAC','Utilizador root + grupo sudo'],
+ ['Elevar privilégios','Janela do UAC (consentimento ou credenciais)','sudo comando (palavra-passe do próprio utilizador)'],
+ ['Onde estão as contas','Gestão de Computadores → Utilizadores e Grupos Locais (base SAM)','/etc/passwd, /etc/group e /etc/shadow'],
+ ['Criar utilizador','New-LocalUser ou net user nome * /add','sudo useradd -m nome ; sudo passwd nome'],
+ ['Juntar a um grupo','Add-LocalGroupMember ou net localgroup grupo nome /add','sudo usermod -aG grupo nome'],
+ ['Modelo de permissões','Listas ACL: vários utilizadores e grupos por pasta','rwx para dono, grupo e outros (+ ACL com setfacl)'],
+ ['Negar acesso','Entradas «Negar» explícitas, que prevalecem','Não há «negar»: tira-se a permissão (ex.: outros = 0)'],
+ ['Herança','Subpastas herdam a ACL da pasta-mãe','Não há herança de rwx; o setgid herda o grupo e a umask define o padrão'],
+ ['Ver e alterar na linha de comandos','icacls pasta ; icacls pasta /grant grupo:(OI)(CI)M','ls -l ; chmod 770 pasta ; chown :grupo pasta'],
+ ['Testar como outro utilizador','Mudar de utilizador (ou runas)','su - nome']
+];
+
+/* ===== Motor Windows: contas, grupos, ACL NTFS ===== */
+const LV=['F','M','RX','L','R','W'];
+const LVN={F:'Controlo total',M:'Modificar',RX:'Ler e executar',L:'Listar conteúdo da pasta',R:'Leitura',W:'Escrita'};
+const LVR={F:'rxwdp',M:'rxwd',RX:'rx',L:'rx',R:'r',W:'w'};
+const LVIMP={F:['F','M','RX','L','R','W'],M:['M','RX','L','R','W'],RX:['RX','L','R'],L:['L'],R:['R'],W:['W']};
+const BUILTIN=['Administradores','Utilizadores','Convidados','Utilizadores do Ambiente de Trabalho Remoto'];
+const WROOT='C:\\Empresa';
+function wInit(t,fault){
+  const m={pc:'W11-EQ'+nn(),users:{Administrador:{full:'',groups:['Administradores'],on:false,pw:true,must:false},aluno:{full:'Aluno',groups:['Administradores','Utilizadores'],on:true,pw:true,must:false},Convidado:{full:'',groups:['Convidados'],on:false,pw:false,must:false}},
+    groups:{Administradores:{d:'Os administradores têm acesso total e sem restrições ao computador'},Utilizadores:{d:'Impede alterações acidentais ou intencionais ao nível do sistema'},Convidados:{d:'Acesso limitado, por omissão igual ao dos utilizadores'},'Utilizadores do Ambiente de Trabalho Remoto':{d:'Podem iniciar sessão remotamente'}},
+    fs:{},session:'aluno',cwd:WROOT,log:[],flags:{},tests:{}};
+  m.fs[WROOT]={acl:[{p:'Administradores',t:'A',lv:['F']},{p:'SYSTEM',t:'A',lv:['F']},{p:'Utilizadores',t:'A',lv:['RX']}],inh:false,files:['Leia-me.txt']};
+  m.fs[WROOT+'\\'+t.fA]={acl:[],inh:true,files:['Indice.txt']};
+  m.fs[WROOT+'\\'+t.fB]={acl:[],inh:true,files:['Lista.xlsx']};
+  if(fault){
+    t.u.forEach((u,i)=>m.users[u]={full:t.n[i],groups:['Utilizadores',i<2?t.gA:t.gB].concat(i===0?['Administradores']:[]),on:true,pw:true,must:false});
+    m.groups[t.gA]={d:t.lA};m.groups[t.gB]={d:t.lB};
+    const A=m.fs[WROOT+'\\'+t.fA];A.inh=false;A.acl=[{p:'Administradores',t:'A',lv:['F']},{p:'SYSTEM',t:'A',lv:['F']},{p:t.gA,t:'A',lv:LVIMP.M.slice()},{p:t.u[1],t:'D',lv:['W']}];
+    const B=m.fs[WROOT+'\\'+t.fB];B.inh=false;B.acl=[{p:'Administradores',t:'A',lv:['F']},{p:'SYSTEM',t:'A',lv:['F']},{p:t.gB,t:'A',lv:LVIMP.M.slice()},{p:t.gA,t:'A',lv:LVIMP.RX.slice()}];
+  }
+  return m;
+}
+const wParent=p=>p.includes('\\',3)&&p!==WROOT?p.slice(0,p.lastIndexOf('\\')):null;
+function wAcl(m,p){const n=m.fs[p];if(!n)return[];let L=n.acl.map(e=>({...e,i:false}));const par=wParent(p);if(n.inh&&par&&m.fs[par])L=L.concat(wAcl(m,par).map(e=>({...e,i:true})));return L}
+function wGroupsOf(m,u){if(u==='SYSTEM')return[];const x=m.users[u];return x?['Todos','Utilizadores autenticados',...x.groups]:[]}
+function wEff(m,u,p){const pr=[u,...wGroupsOf(m,u)].map(s=>s.toLowerCase());let al='',de='';wAcl(m,p).forEach(e=>{if(!pr.includes(e.p.toLowerCase()))return;const r=e.lv.map(l=>LVR[l]).join('');if(e.t==='A')al+=r;else de+=r});const s=new Set();[...al].forEach(c=>{if(!de.includes(c))s.add(c)});return s}
+function wIsAdmin(m,u){return !!m.users[u]?.groups.includes('Administradores')}
+function wFindP(m,name){if(!name)return null;let n=name.replace(/^"|"$/g,'').replace(/^(builtin|nt authority|w11-eq\d+|\.)\\/i,'');const l=n.toLowerCase();if(l==='system')return'SYSTEM';if(l==='todos'||l==='everyone')return'Todos';if(l==='users')return'Utilizadores';if(l==='administrators')return'Administradores';const u=Object.keys(m.users).find(k=>k.toLowerCase()===l);if(u)return u;const g=Object.keys(m.groups).find(k=>k.toLowerCase()===l);return g||null}
+function wPdisp(m,p){if(BUILTIN.includes(p))return'BUILTIN\\'+p;if(p==='SYSTEM')return'NT AUTHORITY\\SYSTEM';if(p==='Todos')return'Todos';return m.pc+'\\'+p}
+function wPath(m,raw){if(!raw)return m.cwd;let s=raw.replace(/^"|"$/g,'').replace(/\//g,'\\').replace(/\\$/,'');if(/^[a-z]:/i.test(s))s='C:'+s.slice(2);else s=m.cwd+'\\'+s;const parts=[];s.split('\\').forEach((x,i)=>{if(i===0){parts.push('C:');return}if(!x||x==='.')return;if(x==='..')parts.length>1&&parts.pop();else parts.push(x)});const full=parts.join('\\');return Object.keys(m.fs).find(k=>k.toLowerCase()===full.toLowerCase())||full}
+function wLog(m,s){m.log.push(`${now()} ${s}`);if(m.log.length>80)m.log.shift()}
+function wSetLv(arr,l,on){let s=new Set(arr);if(on)LVIMP[l].forEach(x=>s.add(x));else s.delete(l);return LV.filter(x=>s.has(x))}
+function wGrant(m,p,who,t,lv,replace){const n=m.fs[p];let e=n.acl.find(x=>x.p===who&&x.t===t);if(!e){e={p:who,t,lv:[]};n.acl.push(e)}if(replace)e.lv=[];LVIMP[lv].forEach(x=>{if(!e.lv.includes(x))e.lv.push(x)});e.lv=LV.filter(x=>e.lv.includes(x))}
+function wDisableInh(m,p,convert){const n=m.fs[p];if(!n.inh)return;if(convert){wAcl(m,p).filter(e=>e.i).forEach(e=>{const ex=n.acl.find(x=>x.p===e.p&&x.t===e.t);if(ex)e.lv.forEach(l=>{if(!ex.lv.includes(l))ex.lv.push(l)});else n.acl.push({p:e.p,t:e.t,lv:e.lv.slice()})})}n.inh=false}
+function wAccess(m,p,what){const r=wEff(m,m.session,p);return what==='read'?r.has('r'):r.has('w')}
+/* registo dos testes de acesso para as missões */
+function wNote(m,p,what,ok){const t=T(),u=m.session;const inA=m.users[u]?.groups.includes(t.gA),inB=m.users[u]?.groups.includes(t.gB);const isA=p.toLowerCase().endsWith('\\'+t.fA.toLowerCase());
+  if(isA&&ok&&what==='write'&&inA&&!wIsAdmin(m,u))m.tests.wA=true;
+  if(isA&&!ok&&inB&&!inA)m.tests.dB=true;
+  wLog(m,`${u} ${what==='read'?'abriu':'criou um ficheiro em'} ${p}: ${ok?'permitido':'ACESSO NEGADO'}`)}
+
+/* ===== PowerShell ===== */
+function wRun(m,line,ask){
+  const out=[];const P=s=>out.push(s);const E=s=>{out.push({e:1,s});return out};
+  const t=tok(line);if(!t.length)return out;const c=t[0].toLowerCase(),a=t.slice(1),al=a.map(x=>x.toLowerCase());
+  const adm=wIsAdmin(m,m.session);const need=()=>{if(!adm){E(c.startsWith('net')?'Erro de sistema 5.\n\nAcesso negado.':'Acesso negado. Esta operação requer privilégios de administrador (abra o Terminal como administrador).');return true}return false};
+  const opt=n=>{const i=al.indexOf('-'+n);return i>=0?a[i+1]:undefined};
+  m.flags.ps=true;
+  switch(c){
+   case 'help':case 'get-help':P(`Comandos disponíveis (simulados):
+  whoami [/groups]   hostname   cls   cd   dir
+  net user [nome [palavra-passe|*] [/add|/delete|/active:no|/active:yes]]
+  net localgroup [grupo [nome] [/add|/delete]]
+  Get-LocalUser   Get-LocalGroup   Get-LocalGroupMember -Group grupo
+  New-LocalUser -Name nome [-FullName "Nome"]     (pede a palavra-passe)
+  New-LocalGroup -Name grupo [-Description "texto"]
+  Add-LocalGroupMember -Group grupo -Member nome
+  Remove-LocalGroupMember -Group grupo -Member nome
+  Disable-LocalUser nome   Enable-LocalUser nome
+  icacls pasta
+  icacls pasta /grant grupo:(OI)(CI)M      (F, M, RX, R, W)
+  icacls pasta /grant:r ...   /deny nome:W   /remove[:g|:d] nome
+  icacls pasta /inheritance:d   (desativar e copiar)   :r (remover herdadas)   :e (ativar)
+  New-Item -Path pasta -Name ficheiro.txt -ItemType File`);break;
+   case 'cls':case 'clear':return[{clear:1}];
+   case 'hostname':P(m.pc);break;
+   case 'whoami':if(al[0]==='/groups'){P('NOME DO GRUPO\n=====================================');wGroupsOf(m,m.session).forEach(g=>P(BUILTIN.includes(g)?'BUILTIN\\'+g:g==='Todos'||g==='Utilizadores autenticados'?g:m.pc+'\\'+g))}else P((m.pc+'\\'+m.session).toLowerCase());break;
+   case 'cd':case 'set-location':{const p=wPath(m,a.join(' '));if(!m.fs[p]&&p!=='C:')return E(`cd : Não é possível localizar o caminho '${p}' porque não existe.`);m.cwd=p;break}
+   case 'dir':case 'ls':case 'get-childitem':{const p=wPath(m,a.filter(x=>!x.startsWith('-')).join(' ')||'');if(!m.fs[p])return E(`Get-ChildItem : Não é possível localizar o caminho '${p}'.`);if(!wAccess(m,p,'read')){wNote(m,p,'read',false);return E(`Get-ChildItem : O acesso ao caminho '${p}' foi negado.`)}wNote(m,p,'read',true);P(`\n    Diretório: ${p}\n\nMode    Name\n----    ----`);Object.keys(m.fs).filter(k=>wParent(k)===p).forEach(k=>P('d----   '+k.split('\\').pop()));m.fs[p].files.forEach(f=>P('-a---   '+f));break}
+   case 'new-item':case 'ni':{const p=wPath(m,opt('path')||'.');const nm=opt('name');if(!m.fs[p])return E('New-Item : Não é possível localizar o caminho.');if(!nm)return E('New-Item : indique -Name');const ok=wAccess(m,p,'write');wNote(m,p,'write',ok);if(!ok)return E(`New-Item : O acesso ao caminho '${p}\\${nm}' foi negado.`);m.fs[p].files.push(nm);P(`\n    Diretório: ${p}\n\nMode    Name\n-a---   ${nm}`);break}
+   case 'net':{
+     if(al[0]==='user'){
+       if(a.length===1){P(`\nContas de utilizador de \\\\${m.pc}\n\n-------------------------------------------------------------------------------`);P(Object.keys(m.users).map(u=>u.padEnd(25)).join(''));P('O comando foi concluído com êxito.');break}
+       const name=a[1],sw=al.filter(x=>x.startsWith('/'));const pw=a.slice(2).find(x=>!x.startsWith('/'));
+       if(sw.includes('/add')){if(need())return out;if(!/^[^\\/\[\]:;|=,+*?<>@"]{1,20}$/.test(name))return E('O nome de utilizador é inválido.');if(wFindP(m,name))return E('A conta já existe.\n\nObtenha mais ajuda escrevendo NET HELPMSG 2224.');
+         const mk=()=>{m.users[name]={full:'',groups:['Utilizadores'],on:true,pw:!!pw,must:false};wLog(m,`net user ${name} /add`)};
+         if(pw==='*'){ask(['Escreva uma palavra-passe para o utilizador:','Escreva novamente a palavra-passe para confirmar:'],v=>{if(v[0]!==v[1])return[{e:1,s:'As palavras-passe não coincidem.'}];mk();m.users[name].pw=!!v[0];return['O comando foi concluído com êxito.']});return out}
+         mk();P('O comando foi concluído com êxito.');break}
+       const u=wFindP(m,name);if(!u||!m.users[u])return E('Não foi possível encontrar o nome de utilizador.\n\nObtenha mais ajuda escrevendo NET HELPMSG 2221.');
+       if(sw.includes('/delete')){if(need())return out;if(u==='aluno'||u==='Administrador')return E('Não é possível eliminar esta conta.');delete m.users[u];wLog(m,`net user ${u} /delete`);P('O comando foi concluído com êxito.');break}
+       const act=sw.find(x=>x.startsWith('/active:'));if(act){if(need())return out;m.users[u].on=act.endsWith('yes');wLog(m,`conta ${u} ${m.users[u].on?'ativada':'desativada'}`);P('O comando foi concluído com êxito.');break}
+       if(pw){if(need())return out;if(pw==='*'){ask(['Escreva uma palavra-passe para o utilizador:','Escreva novamente a palavra-passe para confirmar:'],v=>{if(v[0]!==v[1])return[{e:1,s:'As palavras-passe não coincidem.'}];m.users[u].pw=true;wLog(m,`palavra-passe de ${u} definida`);return['O comando foi concluído com êxito.']});return out}m.users[u].pw=true;wLog(m,`palavra-passe de ${u} definida`);P('O comando foi concluído com êxito.');break}
+       const x=m.users[u];P(`Nome de utilizador             ${u}\nNome completo                  ${x.full}\nConta ativa                    ${x.on?'Sim':'Não'}\nPalavra-passe obrigatória      ${x.pw?'Sim':'Não'}\n\nAssociações de grupo locais    ${x.groups.map(g=>'*'+g).join('  ')}\nO comando foi concluído com êxito.`);break}
+     if(al[0]==='localgroup'){
+       if(a.length===1){P(`\nAliases para \\\\${m.pc}\n\n-------------------------------------------------------------------------------`);Object.keys(m.groups).forEach(g=>P('*'+g));P('O comando foi concluído com êxito.');break}
+       const sw=al.filter(x=>x.startsWith('/'));const gname=a[1];const mem=a.slice(2).filter(x=>!x.startsWith('/'));
+       if(sw.includes('/add')&&!mem.length){if(need())return out;if(wFindP(m,gname))return E('O grupo ou o utilizador já existe.');m.groups[gname]={d:''};wLog(m,`grupo ${gname} criado`);P('O comando foi concluído com êxito.');break}
+       const g=Object.keys(m.groups).find(k=>k.toLowerCase()===gname.toLowerCase());if(!g)return E('O grupo local especificado não existe.');
+       if(sw.includes('/delete')&&!mem.length){if(need())return out;if(BUILTIN.includes(g))return E('Não é possível eliminar um grupo incorporado.');delete m.groups[g];Object.values(m.users).forEach(x=>x.groups=x.groups.filter(y=>y!==g));wLog(m,`grupo ${g} eliminado`);P('O comando foi concluído com êxito.');break}
+       if(mem.length){if(need())return out;for(const nm of mem){const u=wFindP(m,nm);if(!u||!m.users[u])return E(`Erro de sistema 1789.\n\nNão existe mapeamento entre nomes de conta e IDs de segurança: ${nm}`);const x=m.users[u];if(sw.includes('/delete'))x.groups=x.groups.filter(y=>y!==g);else{if(x.groups.includes(g))return E('Erro de sistema 1378.\n\nO nome de conta especificado já é membro do grupo.');x.groups.push(g)}wLog(m,`${u} ${sw.includes('/delete')?'removido de':'adicionado a'} ${g}`)}P('O comando foi concluído com êxito.');break}
+       P(`Nome do alias     ${g}\nComentário        ${m.groups[g].d}\n\nMembros\n\n-------------------------------------------------------------------------------`);Object.keys(m.users).filter(u=>m.users[u].groups.includes(g)).forEach(u=>P(u));P('O comando foi concluído com êxito.');break}
+     return E('A sintaxe deste comando é:\n\nNET USER | NET LOCALGROUP');}
+   case 'get-localuser':P('\nName           Enabled Description\n----           ------- -----------');Object.entries(m.users).forEach(([u,x])=>P(`${u.padEnd(15)}${(x.on?'True':'False').padEnd(8)}${x.full}`));break;
+   case 'get-localgroup':P('\nName                                       Description\n----                                       -----------');Object.entries(m.groups).forEach(([g,x])=>P(`${g.padEnd(43)}${x.d}`));break;
+   case 'get-localgroupmember':{const gname=opt('group')||a.find(x=>!x.startsWith('-'));const g=Object.keys(m.groups).find(k=>k.toLowerCase()===(gname||'').toLowerCase());if(!g)return E(`Get-LocalGroupMember : Não foi encontrado o grupo ${gname}.`);P('\nObjectClass Name                      PrincipalSource\n----------- ----                      ---------------');Object.keys(m.users).filter(u=>m.users[u].groups.includes(g)).forEach(u=>P(`Utilizador  ${(m.pc+'\\'+u).padEnd(26)}Local`));break}
+   case 'new-localuser':{if(need())return out;const name=opt('name')||(a[0]&&!a[0].startsWith('-')?a[0]:undefined);if(!name)return E('New-LocalUser : indique -Name');if(wFindP(m,name))return E(`New-LocalUser : O utilizador ${name} já existe.`);const full=opt('fullname')||'';const nopw=al.includes('-nopassword');
+     const mk=pw=>{m.users[name]={full,groups:['Utilizadores'],on:true,pw,must:false};wLog(m,`New-LocalUser ${name}`);return[`\nName           Enabled Description\n----           ------- -----------\n${name.padEnd(15)}True`]};
+     if(nopw){out.push(...mk(false));break}ask(['Password:'],v=>mk(!!v[0]));return out}
+   case 'new-localgroup':{if(need())return out;const name=opt('name')||a.find(x=>!x.startsWith('-'));if(!name)return E('New-LocalGroup : indique -Name');if(wFindP(m,name))return E(`New-LocalGroup : O grupo ${name} já existe.`);m.groups[name]={d:opt('description')||''};wLog(m,`New-LocalGroup ${name}`);P(`\nName       Description\n----       -----------\n${name}`);break}
+   case 'add-localgroupmember':case 'remove-localgroupmember':{if(need())return out;const g=Object.keys(m.groups).find(k=>k.toLowerCase()===(opt('group')||'').toLowerCase());if(!g)return E(`${t[0]} : Não foi encontrado o grupo ${opt('group')||''}.`);const mems=(opt('member')||'').split(',').filter(Boolean);if(!mems.length)return E(`${t[0]} : indique -Member`);for(const nm of mems){const u=wFindP(m,nm);if(!u||!m.users[u])return E(`${t[0]} : Não foi encontrado o principal ${nm}.`);const x=m.users[u];if(c==='add-localgroupmember'){if(x.groups.includes(g))return E(`Add-LocalGroupMember : ${m.pc}\\${u} já é membro do grupo ${g}.`);x.groups.push(g)}else x.groups=x.groups.filter(y=>y!==g);wLog(m,`${u} ${c.startsWith('add')?'adicionado a':'removido de'} ${g}`)}break}
+   case 'disable-localuser':case 'enable-localuser':{if(need())return out;const u=wFindP(m,opt('name')||a.find(x=>!x.startsWith('-')));if(!u||!m.users[u])return E(`${t[0]} : utilizador não encontrado.`);m.users[u].on=c.startsWith('enable');wLog(m,`conta ${u} ${m.users[u].on?'ativada':'desativada'}`);break}
+   case 'icacls':{const p=wPath(m,a[0]);if(!a[0])return E('icacls nome /grant utilizador:permissão ... (escreva help)');if(!m.fs[p])return E(`${a[0]}: O sistema não consegue encontrar o ficheiro especificado.\nProcessados com êxito 0 ficheiros; falha ao processar 1 ficheiros`);
+     const sw=al[1];
+     if(!sw){const L=wAcl(m,p);const pad=' '.repeat(p.length+1);L.forEach((e,i)=>{const lv=e.lv.includes('F')?'F':e.lv.includes('M')?'M':e.lv.includes('RX')?'RX':e.lv.filter(x=>x!=='L').join(',')||'L';P(`${i?pad:p+' '}${wPdisp(m,e.p)}:${e.i?'(I)':''}(OI)(CI)${e.t==='D'?'(DENY)':''}(${lv})`)});P('\nProcessados com êxito 1 ficheiros; falha ao processar 0 ficheiros');break}
+     if(need())return out;
+     if(sw.startsWith('/inheritance:')){const k=sw.split(':')[1];if(k==='e'){m.fs[p].inh=true}else if(k==='d'||k==='r'){if(!m.fs[p].inh)return E('A herança já está desativada.');wDisableInh(m,p,k==='d')}else return E('Parâmetro inválido');wLog(m,`icacls ${p} /inheritance:${k}`);P('ficheiro processado: '+p+'\nProcessados com êxito 1 ficheiros; falha ao processar 0 ficheiros');break}
+     if(sw==='/grant'||sw==='/grant:r'||sw==='/deny'){const specs=a.slice(2);if(!specs.length)return E('Falta utilizador:permissão');for(const s of specs){const i=s.lastIndexOf(':');if(i<1)return E(`Mapeamento inválido: ${s}`);const who=wFindP(m,s.slice(0,i));if(!who)return E(`${s.slice(0,i)}: Não foi efetuado nenhum mapeamento entre os nomes de conta e os IDs de segurança.\nProcessados com êxito 0 ficheiros; falha ao processar 1 ficheiros`);const r=s.slice(i+1).toUpperCase().replace(/\((OI|CI|IO|NP|I)\)/g,'').replace(/[()]/g,'');const lv=['F','M','RX','R','W'].find(x=>x===r)||(r==='RW'?'M':null);if(!lv)return E(`Permissão inválida: ${s.slice(i+1)} (use F, M, RX, R ou W)`);wGrant(m,p,who,sw==='/deny'?'D':'A',lv,sw==='/grant:r');wLog(m,`icacls ${p} ${sw} ${who}:${lv}`)}P('ficheiro processado: '+p+'\nProcessados com êxito 1 ficheiros; falha ao processar 0 ficheiros');break}
+     if(sw.startsWith('/remove')){const who=wFindP(m,a[2]);if(!who)return E('Falta o utilizador ou grupo a remover.');const k=sw.split(':')[1];const n=m.fs[p];const before=n.acl.length;n.acl=n.acl.filter(e=>!(e.p===who&&(!k||(k==='g'&&e.t==='A')||(k==='d'&&e.t==='D'))));if(n.acl.length===before&&wAcl(m,p).some(e=>e.i&&e.p===who))return E(`${who} só tem permissões herdadas: desative a herança primeiro (/inheritance:d).`);wLog(m,`icacls ${p} /remove ${who}`);P('ficheiro processado: '+p+'\nProcessados com êxito 1 ficheiros; falha ao processar 0 ficheiros');break}
+     return E('Parâmetro inválido: '+a[1]);}
+   default:return E(`${t[0]} : O termo '${t[0]}' não é reconhecido como nome de cmdlet, função, ficheiro de script ou programa operável. (Escreva help.)`);
+  }
+  return out;
+}
+
+/* ===== Ambiente de trabalho Windows simulado ===== */
+const WAPPS={comp:{n:'Gestão de Computadores',adm:true,ic:'#5b6b82'},exp:{n:'Explorador de Ficheiros',ic:'#f2b630'},ps:{n:'Terminal',ic:'#1f2a3a'}};
+function wUI(host){return host.__ui||(host.__ui={open:[],act:null,comp:{tab:'users',sel:null},exp:{path:WROOT,sel:null},menu:false,dlg:null,el:{}})}
+function wRender(host,m,after){
+  const U=wUI(host);host.__m=m;host.__after=after;
+  const win=()=>{if(!U.act)return `<div class="wempty"><p><b>${esc(m.pc)}</b></p><p>Sessão iniciada como <b>${esc(m.session)}</b>${wIsAdmin(m,m.session)?' (administrador)':' (conta padrão)'}.</p><p>Abram uma aplicação na barra de tarefas ou no menu Iniciar.</p></div>`;
+    const ap=WAPPS[U.act];const el=U.el[U.act];return `<div class="wwin"><div class="wtb"><span>${U.act==='ps'?(wIsAdmin(m,m.session)?'Administrador: Windows PowerShell':'Windows PowerShell'):esc(ap.n)}${el&&U.act==='comp'?' · executado como '+esc(el):''}</span><span class="wx"><button data-a="min" aria-label="Minimizar">–</button><button data-a="close" aria-label="Fechar">✕</button></span></div><div class="wbody">${U.act==='comp'?compBody():U.act==='exp'?expBody():'<div class="wps" id="wps"></div>'}</div></div>`};
+  const compBody=()=>{const C=U.comp;const rows=C.tab==='users'?Object.entries(m.users).map(([u,x])=>`<tr data-a="csel" data-k="${esc(u)}" class="${C.sel===u?'sel':''}"><td>${x.on?'':'⊘ '}${esc(u)}</td><td>${esc(x.full)}</td><td>${x.on?'':'Desativada'}</td></tr>`).join(''):Object.entries(m.groups).map(([g,x])=>`<tr data-a="csel" data-k="${esc(g)}" class="${C.sel===g?'sel':''}"><td>${esc(g)}</td><td>${esc(x.d)}</td><td>${Object.values(m.users).filter(y=>y.groups.includes(g)).length} membros</td></tr>`).join('');
+    return `<div class="wcm"><div class="wtree"><b>Gestão do Computador (Local)</b><div>Ferramentas do Sistema</div><div style="padding-left:10px">Utilizadores e Grupos Locais</div><button data-a="ctab" data-k="users" class="${C.tab==='users'?'on':''}">Utilizadores</button><button data-a="ctab" data-k="groups" class="${C.tab==='groups'?'on':''}">Grupos</button></div><div class="wlist"><div class="wtool"><button data-a="${C.tab==='users'?'dnewuser':'dnewgroup'}">${C.tab==='users'?'Novo utilizador…':'Novo grupo…'}</button><button data-a="cprops" ${C.sel?'':'disabled'}>Propriedades</button><button data-a="cdel" ${C.sel?'':'disabled'}>Eliminar</button></div><div class="scroll"><table class="wt"><thead><tr><th>Nome</th><th>${C.tab==='users'?'Nome completo':'Descrição'}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div></div>`};
+  const expBody=()=>{const X=U.exp;const kids=Object.keys(m.fs).filter(k=>wParent(k)===X.path);const files=m.fs[X.path].files;
+    return `<div class="wex"><div class="waddr"><button data-a="eup" ${X.path===WROOT?'disabled':''} aria-label="Subir">↑</button><span>${esc(X.path)}</span></div><div class="wtool"><button data-a="eopen" ${X.sel?'':'disabled'}>Abrir</button><button data-a="eprops">Propriedades${X.sel?'':' desta pasta'}</button><button data-a="enew">Novo documento de texto</button></div><div class="wicons">${kids.map(k=>{const nm=k.split('\\').pop();return `<button class="wic ${X.sel===k?'sel':''}" data-a="esel" data-k="${esc(k)}"><span class="fold"></span>${esc(nm)}</button>`}).join('')}${files.map(f=>`<div class="wic file"><span class="doc"></span>${esc(f)}</div>`).join('')||(kids.length?'':'<p class="small">Pasta vazia.</p>')}</div></div>`};
+  const task=`<div class="wtask"><button class="wstart ${U.menu?'on':''}" data-a="menu" aria-label="Iniciar"><span></span></button>${Object.entries(WAPPS).map(([k,a])=>`<button class="wtapp ${U.act===k?'on':''} ${U.open.includes(k)?'run':''}" data-a="open" data-k="${k}" title="${a.n}"><i style="background:${a.ic}"></i><em>${a.n.split(' ')[0]}</em></button>`).join('')}<span class="wsess">${esc(m.session)}</span></div>`;
+  const menu=U.menu?`<div class="wmenu"><p><b>${esc(m.session)}</b> · ${wIsAdmin(m,m.session)?'Administrador':'Conta padrão'}</p>${Object.entries(WAPPS).map(([k,a])=>`<button data-a="open" data-k="${k}">${a.n}</button>`).join('')}<hr><button data-a="dswitch">Mudar de utilizador…</button></div>`:'';
+  host.innerHTML=`<div class="wdesk">${win()}${menu}${task}${U.dlg?`<div class="wov">${dlgHtml(U.dlg)}</div>`:''}</div>`;
+  if(U.act==='ps')mountPS();
+  function mountPS(){const el=host.querySelector('#wps');if(!m.tx)m.tx=[];if(!m.hist)m.hist=[];makeTerm(el,{store:m,win:true,welcome:'Windows PowerShell (simulado). Escrevam help para ver os comandos.',prompt:()=>[{t:`PS ${m.cwd}> `,c:'pw'}],run:(l,ask)=>{const ask2=(lb,f)=>ask(lb,v=>{const n1=m.log.length;const r=f(v);if(m.log.length>n1)m.flags.psChange=true;return r});const n0=m.log.length;const r=wRun(m,l,ask2);if(m.log.length>n0)m.flags.psChange=true;return r},after:()=>after&&after()}).focus()}
+  function dlgHtml(d){
+    const err=d.err?`<div class="msg erro">${esc(d.err)}</div>`:'';
+    const fr=(title,body,btns)=>`<div class="wdlg" role="dialog" aria-label="${esc(title)}"><div class="wtb"><span>${esc(title)}</span><span class="wx"><button data-a="dclose" aria-label="Fechar">✕</button></span></div><div class="wdb">${body}${err}</div><div class="wdf">${btns}</div></div>`;
+    if(d.t==='newuser')return fr('Novo utilizador',`<label>Nome de utilizador<input id="du" value="${esc(d.v?.u||'')}" autocomplete="off"></label><label>Nome completo<input id="df" value="${esc(d.v?.f||'')}" autocomplete="off"></label><label>Palavra-passe<input id="dp" type="password" autocomplete="new-password"></label><label>Confirmar palavra-passe<input id="dp2" type="password" autocomplete="new-password"></label><label class="chk"><input type="checkbox" id="dmust"> O utilizador tem de alterar a palavra-passe no próximo início de sessão</label><label class="chk"><input type="checkbox" id="doff"> A conta está desativada</label>`,`<button data-a="newuser">Criar</button><button class="ghost" data-a="dclose">Fechar</button>`);
+    if(d.t==='newgroup')return fr('Novo grupo',`<label>Nome do grupo<input id="dg" autocomplete="off"></label><label>Descrição<input id="dd" autocomplete="off"></label><label>Membros (nomes separados por vírgula)<input id="dm" autocomplete="off" placeholder="ex.: ana, bruno"></label>`,`<button data-a="newgroup">Criar</button><button class="ghost" data-a="dclose">Fechar</button>`);
+    if(d.t==='uprops'){const x=m.users[d.k];return fr('Propriedades de '+d.k,`<p><b>${esc(d.k)}</b> · ${esc(x.full)}</p><label class="chk"><input type="checkbox" id="doff2"${x.on?'':' checked'}> A conta está desativada</label><h4>Membro de</h4><ul class="wml">${x.groups.map(g=>`<li>${esc(g)} <button class="ghost" data-a="urmg" data-k="${esc(g)}">Remover</button></li>`).join('')}</ul><div class="row"><input id="dag" placeholder="Nome do grupo" aria-label="Grupo a adicionar" autocomplete="off"><button data-a="uaddg">Adicionar</button></div>`,`<button data-a="uok">OK</button>`)}
+    if(d.t==='gprops'){const mem=Object.keys(m.users).filter(u=>m.users[u].groups.includes(d.k));return fr('Propriedades de '+d.k,`<p>${esc(m.groups[d.k].d)}</p><h4>Membros</h4><ul class="wml">${mem.map(u=>`<li>${esc(u)} <button class="ghost" data-a="grmu" data-k="${esc(u)}">Remover</button></li>`).join('')||'<li>(sem membros)</li>'}</ul><div class="row"><input id="dau" placeholder="Nome do utilizador" aria-label="Utilizador a adicionar" autocomplete="off"><button data-a="gaddu">Adicionar</button></div>`,`<button data-a="dclose">OK</button>`)}
+    if(d.t==='switch')return fr('Mudar de utilizador',`<label>Utilizador<select id="dsu">${Object.keys(m.users).filter(u=>m.users[u].on).map(u=>`<option${u===m.session?' selected':''}>${esc(u)}</option>`).join('')}</select></label><label>Palavra-passe<input id="dsp" type="password" autocomplete="off"></label><p class="small">Simulação: qualquer palavra-passe é aceite se a conta tiver uma definida.</p>`,`<button data-a="switch">Iniciar sessão</button><button class="ghost" data-a="dclose">Cancelar</button>`);
+    if(d.t==='must')return fr('Tem de alterar a palavra-passe',`<p>A conta <b>${esc(d.k)}</b> tem de alterar a palavra-passe antes de iniciar sessão.</p><label>Nova palavra-passe<input id="dn1" type="password"></label><label>Confirmar<input id="dn2" type="password"></label>`,`<button data-a="mustok">Alterar e entrar</button>`);
+    if(d.t==='uac'){const admins=Object.keys(m.users).filter(u=>m.users[u].on&&wIsAdmin(m,u));return `<div class="wdlg uac" role="dialog" aria-label="Controlo de Conta de Utilizador"><div class="uach">Controlo de Conta de Utilizador</div><div class="wdb"><p><b>Pretende permitir que esta aplicação faça alterações ao seu dispositivo?</b></p><p>${esc(d.what)}<br><span class="small">Fabricante verificado: Microsoft Windows</span></p>${wIsAdmin(m,m.session)?'':`<p>Para continuar, introduza o nome de utilizador e a palavra-passe de um administrador.</p><label>Administrador<select id="dua">${admins.map(u=>`<option>${esc(u)}</option>`).join('')}</select></label><label>Palavra-passe<input id="dup" type="password"></label>`}${err}</div><div class="wdf"><button data-a="uacyes">Sim</button><button class="ghost" data-a="dclose">Não</button></div></div>`}
+    if(d.t==='msg')return fr(d.title,`<p>${esc(d.text)}</p>`,`<button data-a="dclose">OK</button>`);
+    if(d.t==='props'){const p=d.k;const L=wAcl(m,p);const prs=[...new Set(L.map(e=>e.p))];const sel=d.sel&&prs.includes(d.sel)?d.sel:prs[0];const ent=L.filter(e=>e.p===sel);const has=(t,l)=>ent.some(e=>e.t===t&&e.lv.includes(l));
+      return fr('Propriedades de '+p.split('\\').pop(),`<div class="wtabs"><span class="on">Segurança</span></div><p class="small">Nome do objeto: ${esc(p)}</p><b>Nomes de grupos ou de utilizadores:</b><ul class="wpr">${prs.map(x=>`<li><button class="${x===sel?'sel':''}" data-a="psel" data-k="${esc(x)}">${esc(wPdisp(m,x))}</button></li>`).join('')}</ul><table class="wt perm"><thead><tr><th>Permissões para ${esc(sel||'')}</th><th>Permitir</th><th>Negar</th></tr></thead><tbody>${LV.map(l=>`<tr><td>${LVN[l]}</td><td>${has('A',l)?'✓':''}</td><td>${has('D',l)?'✓':''}</td></tr>`).join('')}</tbody></table><p class="small">Herança: ${m.fs[p].inh?'ativada (as entradas com cinzento vêm da pasta-mãe)':'desativada'}</p>`,`<button data-a="pedit">Editar…</button><button class="ghost" data-a="padv">Avançadas…</button><button class="ghost" data-a="dclose">Fechar</button>`)}
+    if(d.t==='edit'){const p=d.k,n=m.fs[p];const L=wAcl(m,p);const prs=[...new Set(L.map(e=>e.p))];const sel=d.sel&&prs.includes(d.sel)?d.sel:prs[0];const exA=n.acl.find(e=>e.p===sel&&e.t==='A'),exD=n.acl.find(e=>e.p===sel&&e.t==='D');const inh=(t,l)=>L.some(e=>e.i&&e.p===sel&&e.t===t&&e.lv.includes(l));
+      return fr('Permissões para '+p.split('\\').pop(),`<b>Nomes de grupos ou de utilizadores:</b><ul class="wpr">${prs.map(x=>`<li><button class="${x===sel?'sel':''}" data-a="esel2" data-k="${esc(x)}">${esc(wPdisp(m,x))}</button></li>`).join('')}</ul><div class="row"><input id="dadd" placeholder="Nome do utilizador ou grupo" aria-label="Adicionar utilizador ou grupo" autocomplete="off"><button class="ghost" data-a="eadd">Adicionar…</button><button class="ghost" data-a="erem">Remover</button></div><table class="wt perm"><thead><tr><th>Permissões para ${esc(sel||'')}</th><th>Permitir</th><th>Negar</th></tr></thead><tbody>${LV.map(l=>`<tr><td>${LVN[l]}</td><td><input type="checkbox" data-a="echk" data-t="A" data-k="${l}" aria-label="Permitir ${LVN[l]}"${exA?.lv.includes(l)||inh('A',l)?' checked':''}${inh('A',l)?' disabled':''}></td><td><input type="checkbox" data-a="echk" data-t="D" data-k="${l}" aria-label="Negar ${LVN[l]}"${exD?.lv.includes(l)||inh('D',l)?' checked':''}${inh('D',l)?' disabled':''}></td></tr>`).join('')}</tbody></table><p class="small">As caixas desativadas são permissões herdadas. Para as alterar, desative a herança em Avançadas.</p>`,`<button data-a="eok">OK</button>`)}
+    if(d.t==='adv'){const p=d.k,n=m.fs[p];return fr('Definições de segurança avançadas',`<p class="small">${esc(p)}</p><table class="wt"><thead><tr><th>Tipo</th><th>Principal</th><th>Acesso</th><th>Herdado de</th></tr></thead><tbody>${wAcl(m,p).map(e=>`<tr><td>${e.t==='A'?'Permitir':'Negar'}</td><td>${esc(wPdisp(m,e.p))}</td><td>${e.lv.map(l=>LVN[l]).slice(0,1).join('')||'Especial'}${e.lv.length>1&&!e.lv.includes('F')&&!e.lv.includes('M')?' +':''}</td><td>${e.i?esc(wParent(p)):'Nenhum'}</td></tr>`).join('')}</tbody></table>${n.inh?`<p>Esta pasta herda permissões de <b>${esc(wParent(p))}</b>.</p><div class="row"><button data-a="inhconv">Desativar herança: converter em permissões explícitas</button><button class="ghost" data-a="inhrem">Desativar herança: remover as herdadas</button></div>`:`<p>A herança está desativada.</p><button class="ghost" data-a="inhon">Ativar herança</button>`}`,`<button data-a="dclose">OK</button>`)}
+    return '';
+  }
+}
+function wClick(host,e){
+  const b=e.target.closest('[data-a]');if(!b||!host.contains(b))return;const U=wUI(host),m=host.__m,A=b.dataset.a,k=b.dataset.k;const q=s=>host.querySelector(s);
+  const re=()=>{wRender(host,m,host.__after);host.__after&&host.__after()};
+  const say=(title,text)=>{U.dlg={t:'msg',title,text}};
+  const elevate=(what,then)=>{if(wIsAdmin(m,m.session)){then(m.session);return}m.flags.uac=true;wLog(m,`${m.session} pediu privilégios: UAC`);U.dlg={t:'uac',what,then}};
+  if(b.tagName==='INPUT'&&b.type==='checkbox'&&A!=='echk')return;
+  switch(A){
+   case 'menu':U.menu=!U.menu;break;
+   case 'open':U.menu=false;if(WAPPS[k].adm&&!U.el[k]){elevate(WAPPS[k].n,u=>{U.el[k]=u;if(!U.open.includes(k))U.open.push(k);U.act=k});break}if(!U.open.includes(k))U.open.push(k);U.act=k;break;
+   case 'min':U.act=null;break;
+   case 'close':U.open=U.open.filter(x=>x!==U.act);delete U.el[U.act];U.act=U.open[U.open.length-1]||null;break;
+   case 'ctab':U.comp.tab=k;U.comp.sel=null;break;
+   case 'csel':U.comp.sel=k;break;
+   case 'dnewuser':U.dlg={t:'newuser'};break;
+   case 'dnewgroup':U.dlg={t:'newgroup'};break;
+   case 'newuser':{const u=q('#du').value.trim(),f=q('#df').value.trim(),p1=q('#dp').value,p2=q('#dp2').value;if(!u){U.dlg.err='Indique o nome de utilizador.';U.dlg.v={u,f};break}if(/[\\/\[\]:;|=,+*?<>@"]/.test(u)||u.length>20){U.dlg.err='O nome não pode ter os caracteres " / \\ [ ] : ; | = , + * ? < > @ nem mais de 20 caracteres.';U.dlg.v={u,f};break}if(wFindP(m,u)){U.dlg.err=`Já existe a conta ou grupo ${u}.`;U.dlg.v={u,f};break}if(p1!==p2){U.dlg.err='As palavras-passe não coincidem.';U.dlg.v={u,f};break}m.users[u]={full:f,groups:['Utilizadores'],on:!q('#doff').checked,pw:!!p1,must:q('#dmust').checked};wLog(m,`Utilizador ${u} criado (Gestão de Computadores)`);U.dlg={t:'newuser'};U.comp.sel=u;break}
+   case 'newgroup':{const g=q('#dg').value.trim(),dd=q('#dd').value.trim(),mm=q('#dm').value.split(',').map(x=>x.trim()).filter(Boolean);if(!g){U.dlg.err='Indique o nome do grupo.';break}if(wFindP(m,g)){U.dlg.err=`Já existe a conta ou grupo ${g}.`;break}const bad=mm.find(x=>{const u=wFindP(m,x);return !u||!m.users[u]});if(bad){U.dlg.err=`Não foi encontrado o utilizador «${bad}».`;break}m.groups[g]={d:dd};mm.forEach(x=>m.users[wFindP(m,x)].groups.push(g));wLog(m,`Grupo ${g} criado${mm.length?' com '+mm.join(', '):''}`);U.dlg=null;U.comp.sel=g;break}
+   case 'cprops':U.dlg=U.comp.tab==='users'?{t:'uprops',k:U.comp.sel}:{t:'gprops',k:U.comp.sel};break;
+   case 'cdel':{const s=U.comp.sel;if(U.comp.tab==='users'){if(s==='aluno'||s==='Administrador'||s===m.session){say('Gestão de Computadores','Não é possível eliminar esta conta.');break}delete m.users[s]}else{if(BUILTIN.includes(s)){say('Gestão de Computadores','Não é possível eliminar um grupo incorporado.');break}delete m.groups[s];Object.values(m.users).forEach(x=>x.groups=x.groups.filter(g=>g!==s))}wLog(m,`${s} eliminado`);U.comp.sel=null;break}
+   case 'urmg':{const x=m.users[U.dlg.k];x.groups=x.groups.filter(g=>g!==k);wLog(m,`${U.dlg.k} removido de ${k}`);break}
+   case 'uaddg':{const g=Object.keys(m.groups).find(x=>x.toLowerCase()===q('#dag').value.trim().toLowerCase());if(!g){U.dlg.err='Não foi encontrado esse grupo. Verifique o nome.';break}const x=m.users[U.dlg.k];if(!x.groups.includes(g)){x.groups.push(g);wLog(m,`${U.dlg.k} adicionado a ${g}`)}U.dlg.err='';break}
+   case 'uok':{const x=m.users[U.dlg.k];const off=q('#doff2').checked;if(x.on===off){x.on=!off;wLog(m,`conta ${U.dlg.k} ${x.on?'ativada':'desativada'}`)}U.dlg=null;break}
+   case 'grmu':{const x=m.users[k];x.groups=x.groups.filter(g=>g!==U.dlg.k);wLog(m,`${k} removido de ${U.dlg.k}`);break}
+   case 'gaddu':{const u=wFindP(m,q('#dau').value.trim());if(!u||!m.users[u]){U.dlg.err='Não foi encontrado esse utilizador.';break}const x=m.users[u];if(!x.groups.includes(U.dlg.k)){x.groups.push(U.dlg.k);wLog(m,`${u} adicionado a ${U.dlg.k}`)}U.dlg.err='';break}
+   case 'dswitch':U.menu=false;U.dlg={t:'switch'};break;
+   case 'switch':{const u=q('#dsu').value;const x=m.users[u];if(!x.pw&&u!=='aluno'){U.dlg.err='Esta conta não tem palavra-passe definida: defina uma antes de iniciar sessão.';break}if(!q('#dsp').value){U.dlg.err='Escreva a palavra-passe.';break}if(x.must){U.dlg={t:'must',k:u};break}m.session=u;U.open=[];U.act=null;U.el={};U.exp={path:WROOT,sel:null};U.comp={tab:'users',sel:null};wLog(m,`Sessão iniciada como ${u}`);U.dlg=null;break}
+   case 'mustok':{if(!q('#dn1').value||q('#dn1').value!==q('#dn2').value){U.dlg.err='As palavras-passe têm de coincidir e não podem estar vazias.';break}m.users[U.dlg.k].must=false;m.session=U.dlg.k;U.open=[];U.act=null;U.el={};U.exp={path:WROOT,sel:null};U.comp={tab:'users',sel:null};wLog(m,`${U.dlg.k} alterou a palavra-passe e iniciou sessão`);U.dlg=null;break}
+   case 'uacyes':{const d=U.dlg;let who=m.session;if(!wIsAdmin(m,m.session)){who=q('#dua')?.value;if(!who){d.err='Não há nenhuma conta de administrador ativa.';break}if(!q('#dup').value){d.err='Escreva a palavra-passe do administrador.';break}}U.dlg=null;wLog(m,`UAC aprovado com a conta ${who}`);d.then(who);break}
+   case 'dclose':U.dlg=null;break;
+   case 'esel':U.exp.sel=k;break;
+   case 'eup':U.exp.path=wParent(U.exp.path)||WROOT;U.exp.sel=null;break;
+   case 'eopen':{const p=U.exp.sel;const ok=wAccess(m,p,'read');wNote(m,p,'read',ok);if(!ok){say(p.split('\\').pop(),'Não tem permissão para aceder a esta pasta. Contacte o administrador.');break}U.exp.path=p;U.exp.sel=null;break}
+   case 'enew':{const p=U.exp.path;const ok=wAccess(m,p,'write');wNote(m,p,'write',ok);if(!ok){say('Acesso negado à pasta','Precisa de permissão para efetuar esta ação. Peça permissão ao administrador.');break}let i=1,nm='Novo Documento de texto.txt';while(m.fs[p].files.includes(nm))nm=`Novo Documento de texto (${++i}).txt`;m.fs[p].files.push(nm);break}
+   case 'eprops':U.dlg={t:'props',k:U.exp.sel||U.exp.path};break;
+   case 'psel':U.dlg.sel=k;break;
+   case 'pedit':{const p=U.dlg.k,sel=U.dlg.sel;elevate('Editar permissões de '+p.split('\\').pop(),()=>{U.dlg={t:'edit',k:p,sel}});break}
+   case 'padv':U.dlg={t:'adv',k:U.dlg.k,back:U.dlg};break;
+   case 'esel2':U.dlg.sel=k;break;
+   case 'eadd':{const who=wFindP(m,q('#dadd').value.trim());if(!who){U.dlg.err='Não foi encontrado nenhum utilizador ou grupo com esse nome.';break}const n=m.fs[U.dlg.k];if(!n.acl.some(e=>e.p===who)&&!wAcl(m,U.dlg.k).some(e=>e.p===who))n.acl.push({p:who,t:'A',lv:LVIMP.RX.slice()});U.dlg.sel=who;U.dlg.err='';wLog(m,`${who} adicionado às permissões de ${U.dlg.k}`);break}
+   case 'erem':{const p=U.dlg.k,sel=U.dlg.sel||[...new Set(wAcl(m,p).map(e=>e.p))][0];const n=m.fs[p];if(wAcl(m,p).some(e=>e.i&&e.p===sel)&&!n.acl.some(e=>e.p===sel)){U.dlg.err=`Não é possível remover ${sel} porque este objeto está a herdar permissões da pasta-mãe. Desative a herança em Avançadas.`;break}n.acl=n.acl.filter(e=>e.p!==sel);wLog(m,`${sel} removido das permissões de ${p}`);U.dlg.sel=null;U.dlg.err='';break}
+   case 'echk':{const p=U.dlg.k,n=m.fs[p];const sel=U.dlg.sel||[...new Set(wAcl(m,p).map(e=>e.p))][0];const t=b.dataset.t;let ex=n.acl.find(x=>x.p===sel&&x.t===t);if(!ex){ex={p:sel,t,lv:[]};n.acl.push(ex)}ex.lv=wSetLv(ex.lv,k,b.checked);if(!ex.lv.length)n.acl=n.acl.filter(x=>x!==ex);U.dlg.sel=sel;wLog(m,`${p}: ${t==='A'?'Permitir':'Negar'} ${LVN[k]} ${b.checked?'marcado':'desmarcado'} para ${sel}`);break}
+   case 'eok':U.dlg={t:'props',k:U.dlg.k,sel:U.dlg.sel};break;
+   case 'inhconv':case 'inhrem':{const p=U.dlg.k;elevate('Alterar a herança de '+p.split('\\').pop(),()=>{wDisableInh(m,p,A==='inhconv');wLog(m,`Herança desativada em ${p} (${A==='inhconv'?'convertida':'removida'})`);U.dlg={t:'adv',k:p}});break}
+   case 'inhon':{const p=U.dlg.k;elevate('Ativar a herança',()=>{m.fs[p].inh=true;wLog(m,`Herança ativada em ${p}`);U.dlg={t:'adv',k:p}});break}
+   default:return;
+  }
+  re();
+}
+
+/* ===== Motor Ubuntu: utilizadores, grupos, permissões ===== */
+const LD=(o,g,m,c={})=>({t:'d',o,g,m,c,acl:{}});
+const LF=(o,g,m,x='')=>({t:'f',o,g,m,x,acl:{}});
+function lInit(t,fault){
+  const m={host:'ubu-eq'+nn(),users:{root:{uid:0,groups:['root'],pw:true,home:'/root'},aluno:{uid:1000,groups:['aluno','sudo','users'],pw:true,home:'/home/aluno'}},
+    groups:{root:0,sudo:27,users:100,shadow:42,aluno:1000},stack:['aluno'],cwd:'/home/aluno',log:[],tests:{},hist:[],tx:[],umask:'0002'};
+  m.root=LD('root','root','0755',{
+    etc:LD('root','root','0755',{}),
+    home:LD('root','root','0755',{aluno:LD('aluno','aluno','0750',{'notas.txt':LF('aluno','aluno','0644','Bancada Ubuntu: escrevam help.\n')})}),
+    srv:LD('root','root','0755',{empresa:LD('root','root','0755',{[t.fA]:LD('root','root','0755',{'indice.txt':LF('root','root','0644','Índice\n')}),[t.fB]:LD('root','root','0755',{'lista.ods':LF('root','root','0644','')})})}),
+    tmp:LD('root','root','1777',{}),root:LD('root','root','0700',{})});
+  if(fault){
+    m.groups[t.gA]=1001;m.groups[t.gB]=1002;
+    t.u.forEach((u,i)=>{m.users[u]={uid:1001+i,groups:[u,i<2?t.gA:t.gB].concat(i===0?['sudo']:[]),pw:true,home:'/home/'+u};m.groups[u]=1001+i+10;lget(m,'/home').c[u]=LD(u,u,'0750',{})});
+    const A=lget(m,'/srv/empresa/'+t.fA);A.g=t.gA;A.m='2760';const B=lget(m,'/srv/empresa/'+t.fB);B.g=t.gB;B.m='2770';B.acl={['g:'+t.gA]:5};
+  }
+  return m;
+}
+const lcur=m=>m.stack[m.stack.length-1];
+function lparts(m,p){const base=p.startsWith('/')?[]:(p==='~'||p.startsWith('~/'))?m.users[lcur(m)].home.split('/').filter(Boolean):m.cwd.split('/').filter(Boolean);const segs=(p.startsWith('~')?p.slice(1):p).split('/');const o=base.slice();segs.forEach(s=>{if(!s||s==='.')return;if(s==='..')o.pop();else o.push(s)});return o}
+function lget(m,p){let n=m.root;for(const s of (typeof p==='string'?lparts(m,p):p)){if(!n||n.t!=='d')return null;n=n.c[s]}return n||null}
+function lmember(m,u,g){return !!m.users[u]?.groups.includes(g)}
+function lperm(m,n,u){if(u==='root')return 7;const md=n.m.slice(-3).split('').map(Number);if(n.o===u)return md[0];if(n.acl['u:'+u]!==undefined)return n.acl['u:'+u];let gp=-1;if(lmember(m,u,n.g))gp=md[1];Object.entries(n.acl).forEach(([k,v])=>{if(k.startsWith('g:')&&lmember(m,u,k.slice(2)))gp=Math.max(gp,0)|v});return gp>=0?gp:md[2]}
+function lcan(m,n,bit,u=lcur(m)){return(lperm(m,n,u)&bit)===bit}
+function ltrav(m,parts,u=lcur(m)){let n=m.root;for(let i=0;i<parts.length;i++){if(!lcan(m,n,1,u))return{err:'/'+parts.slice(0,i).join('/')};n=n.c[parts[i]];if(!n)return{none:true}}return{n}}
+function lstr(n){const d=n.m.padStart(4,'0').split('').map(Number);const sp=d[0];let s=(n.t==='d'?'d':'-');[1,2,3].forEach(i=>{const v=d[i];let x=(v&4?'r':'-')+(v&2?'w':'-');let e=v&1?'x':'-';if(i===1&&sp&4)e=v&1?'s':'S';if(i===2&&sp&2)e=v&1?'s':'S';if(i===3&&sp&1)e=v&1?'t':'T';s+=x+e});return s+(Object.keys(n.acl).length?'+':'')}
+function llog(m,s){m.log.push(`${now()} ${s}`);if(m.log.length>80)m.log.shift()}
+function lnote(m,parts,what,ok){const t=T(),u=lcur(m);const path='/'+parts.join('/');const fa='/srv/empresa/'+t.fA;const inA=lmember(m,u,t.gA);
+  if(path.startsWith(fa)&&ok&&what==='write'&&inA&&u!=='root')m.tests.wA=true;
+  if(path.startsWith(fa)&&!ok&&!inA&&u!=='root'&&u!=='aluno')m.tests.dB=true}
+function lmodeApply(n,spec){if(/^[0-7]{3,4}$/.test(spec)){n.m=spec.padStart(4,'0');return true}const old=n.m.padStart(4,'0').split('').map(Number);for(const part of spec.split(',')){const mm=part.match(/^([ugoa]*)([+\-=])([rwxst]*)$/);if(!mm)return false;const who=(mm[1]||'a').replace('a','ugo');let bits=0,sp=0;[...mm[3]].forEach(ch=>{if(ch==='r')bits|=4;if(ch==='w')bits|=2;if(ch==='x')bits|=1;if(ch==='s'){if(who.includes('u'))sp|=4;if(who.includes('g'))sp|=2}if(ch==='t')sp|=1});['u','g','o'].forEach((w,i)=>{if(!who.includes(w))return;const v=old[i+1];old[i+1]=mm[2]==='+'?v|bits:mm[2]==='-'?v&~bits:bits});old[0]=mm[2]==='+'?old[0]|sp:mm[2]==='-'?old[0]&~sp:(mm[2]==='='?sp|(old[0]&~(who.includes('u')?4:0)&~(who.includes('g')?2:0)):old[0])}n.m=old.join('');return true}
+
+function lRun(m,line,ask,depth=0){
+  const out=[];
+  for(const seg of splitTop(line,/^(&&|;)/)){const s=seg.trim();if(!s)continue;const r=lCmd(m,s,ask,depth);out.push(...r.out);if(r.code&&line.includes('&&'))break;if(r.wait)break}
+  return out;
+}
+function lCmd(m,line,ask,depth){
+  const out=[];const P=s=>out.push(s);const E=s=>{out.push({e:1,s});return{out,code:1}};const OK=()=>({out,code:0});
+  let t=tok(line);if(!t.length)return OK();
+  let redir=null;const ri=t.findIndex(x=>x==='>'||x==='>>');if(ri>=0){redir={app:t[ri]==='>>',f:t[ri+1]};t=t.slice(0,ri)}
+  const me=lcur(m);
+  if(t[0]==='sudo'){
+    if(t[1]==='-l'){if(!lmember(m,me,'sudo')&&me!=='root')return E(`Lamentamos, o utilizador ${me} não pode executar sudo em ${m.host}.`);P(`O utilizador ${me} pode executar os seguintes comandos em ${m.host}:\n    (ALL : ALL) ALL`);return OK()}
+    if(me!=='root'&&!lmember(m,me,'sudo')){const t2=T();if(me!=='aluno')m.tests.sD=true;llog(m,`${me}: sudo recusado`);ask&&ask([`[sudo] palavra-passe para ${me}:`],()=>[{e:1,s:`${me} não está no ficheiro sudoers.`}]);if(!ask)return E(`${me} não está no ficheiro sudoers.`);return{out,code:1,wait:1}}
+    const rest=line.replace(/^\s*sudo\s+/,'');if(rest==='-i'||rest==='su'||rest==='su -'||rest==='-s'){m.cwds=m.cwds||[];m.cwds.push(m.cwd);m.stack.push('root');llog(m,`${me} abriu uma shell de root`);return OK()}
+    const exec=()=>{m.stack.push('root');const r=lCmd(m,rest,ask,depth);m.stack.pop();if(me===T().u[0]&&!r.code)m.tests.sOK=true;return r};
+    if(ask&&me!=='root'){ask([`[sudo] palavra-passe para ${me}:`],()=>exec().out);return{out,code:0,wait:1}}
+    return exec();
+  }
+  const [c,...a]=t;const fl=a.filter(x=>/^-/.test(x)).join('');const args=a.filter(x=>!/^-/.test(x));const has=f=>fl.replace(/-/g,'').includes(f);
+  const isroot=me==='root';const deny=s=>E(s+': Permissão recusada');
+  const needRoot=()=>{if(!isroot){E(`${c}: Permissão recusada.\n${c}: não é possível bloquear /etc/passwd; tente mais tarde. (Usem sudo.)`);return true}return false};
+  const done=()=>{if(redir){const txt=out.filter(x=>typeof x==='string').join('\n')+'\n';for(let i=out.length-1;i>=0;i--)if(typeof out[i]==='string')out.splice(i,1);const ps=lparts(m,redir.f);const name=ps.pop();const tr=ltrav(m,ps);if(tr.err)return deny(`bash: ${redir.f}`);if(!tr.n||tr.n.t!=='d')return E(`bash: ${redir.f}: Ficheiro ou diretório inexistente`);const ex=tr.n.c[name];if(ex){if(ex.t==='d')return E(`bash: ${redir.f}: É um diretório`);const ok=lcan(m,ex,2);lnote(m,ps,'write',ok);if(!ok)return deny(`bash: ${redir.f}`);ex.x=redir.app?ex.x+txt:txt}else{const ok=lcan(m,tr.n,3);lnote(m,ps,'write',ok);if(!ok)return deny(`bash: ${redir.f}`);tr.n.c[name]=LF(me,tr.n.m.padStart(4,'0')[0]&2?tr.n.g:m.users[me].groups[0],'0664',txt)}}return OK()};
+  const node=(p,need)=>{const ps=lparts(m,p);const tr=ltrav(m,ps);if(tr.err){lnote(m,ps,'read',false);return{err:deny(`${c}: não é possível aceder a '${p}'`)}}if(tr.none||!tr.n)return{err:E(`${c}: não é possível aceder a '${p}': Ficheiro ou diretório inexistente`)};if(need&&!lcan(m,tr.n,need)){lnote(m,ps,'read',false);return{err:deny(`${c}: não é possível abrir '${p}'`)}}return{n:tr.n,ps}};
+  switch(c){
+   case 'help':P(`Comandos disponíveis (simulados):
+  whoami  id [nome]  groups [nome]  pwd  cd  ls [-l] [-a] [-d]  cat  echo texto > ficheiro  touch  mkdir  rm [-r]
+  sudo comando   sudo -l   su - nome   exit
+  useradd [-m] [-G grupo1,grupo2] nome   adduser nome   passwd nome   userdel [-r] nome
+  usermod -aG grupo nome   groupadd grupo   groupdel grupo   gpasswd -a nome grupo | -d nome grupo
+  getent passwd nome | getent group grupo   cat /etc/passwd | /etc/group
+  chmod 770 pasta | chmod g+rwx,o-rwx pasta | chmod g+s pasta   chown dono:grupo pasta   chgrp grupo pasta
+  getfacl pasta   setfacl -m g:grupo:rx pasta | setfacl -x g:grupo pasta
+  umask   clear   history`);break;
+   case 'clear':return{out:[{clear:1}],code:0};
+   case 'history':m.hist.forEach((h,i)=>P(String(i+1).padStart(5)+'  '+h));break;
+   case 'whoami':P(me);break;
+   case 'hostname':P(m.host);break;
+   case 'pwd':P(m.cwd);break;
+   case 'umask':if(args[0]){m.umask=args[0].padStart(4,'0');break}P(m.umask);break;
+   case 'id':case 'groups':{const u=args[0]||me;const x=m.users[u];if(!x)return E(`${c}: '${u}': utilizador inexistente`);if(c==='groups'){P((args[0]?u+' : ':'')+x.groups.join(' '));break}P(`uid=${x.uid}(${u}) gid=${m.groups[x.groups[0]]??x.uid}(${x.groups[0]}) grupos=${x.groups.map(g=>`${m.groups[g]}(${g})`).join(',')}`);break}
+   case 'getent':{const db=args[0],k=args[1];if(db==='passwd'){Object.entries(m.users).filter(([u])=>!k||u===k).forEach(([u,x])=>P(`${u}:x:${x.uid}:${m.groups[x.groups[0]]??x.uid}::${x.home}:/bin/bash`));if(k&&!m.users[k])return{out,code:2}}else if(db==='group'){Object.entries(m.groups).filter(([g])=>!k||g===k).forEach(([g,id])=>P(`${g}:x:${id}:${Object.keys(m.users).filter(u=>m.users[u].groups.includes(g)&&m.users[u].groups[0]!==g).join(',')}`));if(k&&m.groups[k]===undefined)return{out,code:2}}else return E('getent: base de dados desconhecida (use passwd ou group)');break}
+   case 'cd':{const p=args[0]||'~';const ps=lparts(m,p);const tr=ltrav(m,ps);if(tr.err){lnote(m,ps,'read',false);return deny(`bash: cd: ${p}`)}if(!tr.n)return E(`bash: cd: ${p}: Ficheiro ou diretório inexistente`);if(tr.n.t!=='d')return E(`bash: cd: ${p}: Não é um diretório`);if(!lcan(m,tr.n,1)){lnote(m,ps,'read',false);return deny(`bash: cd: ${p}`)}m.cwd='/'+ps.join('/');lnote(m,ps,'read',true);break}
+   case 'ls':{const targets=args.length?args:['.'];for(const tg of targets){const r=node(tg);if(r.err)return r.err;const n=r.n;if(n.t==='d'&&!has('d')&&!lcan(m,n,4)){lnote(m,r.ps,'read',false);return deny(`ls: não é possível abrir o diretório '${tg}'`)}if(targets.length>1)P(tg+':');let list=n.t==='d'&&!has('d')?Object.entries(n.c).filter(([k])=>has('a')||!k.startsWith('.')).sort(([x],[y])=>x.localeCompare(y)):[[tg,n]];if(has('a')&&n.t==='d'&&!has('d'))list=[['.',n],['..',n]].concat(list);if(has('l'))list.forEach(([k,v])=>P(`${lstr(v)} 1 ${v.o.padEnd(8)} ${v.g.padEnd(11)} ${String(v.t==='d'?4096:v.x.length).padStart(5)} nov 25 10:00 ${k}`));else P(list.map(([k])=>k).join('  '))}break}
+   case 'cat':{if(!args.length)return E('cat: indique um ficheiro');for(const p of args){const pp=p.replace(/^\/etc\//,'');if(p==='/etc/passwd'){Object.entries(m.users).forEach(([u,x])=>P(`${u}:x:${x.uid}:${m.groups[x.groups[0]]??x.uid}::${x.home}:/bin/bash`));continue}if(p==='/etc/group'){Object.entries(m.groups).forEach(([g,id])=>P(`${g}:x:${id}:${Object.keys(m.users).filter(u=>m.users[u].groups.includes(g)&&m.users[u].groups[0]!==g).join(',')}`));continue}if(p==='/etc/shadow'){if(!isroot)return deny('cat: /etc/shadow');Object.entries(m.users).forEach(([u,x])=>P(`${u}:${x.pw?'$y$j9T$'+('a7Qx'+u).slice(0,8)+'…':'!'}:20417:0:99999:7:::`));continue}const r=node(p,4);if(r.err)return r.err;if(r.n.t==='d')return E(`cat: ${p}: É um diretório`);P(r.n.x.replace(/\n$/,''))}break}
+   case 'echo':P(a.join(' '));break;
+   case 'touch':case 'mkdir':{if(!args.length)return E(`${c}: falta o operando`);for(const p of args){const ps=lparts(m,p);const name=ps.pop();const tr=ltrav(m,ps);if(tr.err){lnote(m,ps,'write',false);return deny(`${c}: não é possível criar '${p}'`)}if(!tr.n)return E(`${c}: não é possível criar '${p}': Ficheiro ou diretório inexistente`);if(tr.n.c[name]){if(c==='mkdir')return E(`mkdir: não é possível criar o diretório '${p}': O ficheiro existe`);continue}const ok=lcan(m,tr.n,3);lnote(m,ps,'write',ok);if(!ok)return deny(`${c}: não é possível criar '${p}'`);const grp=Number(tr.n.m.padStart(4,'0')[0])&2?tr.n.g:m.users[me].groups[0];const um=m.umask.slice(-3).split('').map(Number);const mode=(c==='mkdir'?[7,7,7]:[6,6,6]).map((v,i)=>v&~um[i]).join('');tr.n.c[name]=c==='mkdir'?LD(me,grp,(Number(tr.n.m.padStart(4,'0')[0])&2?'2':'0')+mode):LF(me,grp,'0'+mode);llog(m,`${me} criou ${'/'+ps.concat(name).join('/')}`)}break}
+   case 'rm':case 'rmdir':{for(const p of args){const ps=lparts(m,p);const name=ps.pop();const tr=ltrav(m,ps);if(tr.err||!tr.n)return E(`${c}: não é possível remover '${p}'`);const n=tr.n.c[name];if(!n)return E(`${c}: não é possível remover '${p}': Ficheiro ou diretório inexistente`);if(!lcan(m,tr.n,3))return deny(`${c}: não é possível remover '${p}'`);if(n.t==='d'&&c==='rm'&&!has('r'))return E(`rm: não é possível remover '${p}': É um diretório`);delete tr.n.c[name];llog(m,`${me} removeu ${p}`)}break}
+   case 'chmod':{const spec=args[0];if(!spec||args.length<2)return E('chmod: falta o operando');for(const p of args.slice(1)){const r=node(p);if(r.err)return r.err;if(r.n.o!==me&&!isroot)return E(`chmod: a alterar as permissões de '${p}': Operação não permitida`);if(!lmodeApply(r.n,spec))return E(`chmod: modo inválido: '${spec}'`);llog(m,`chmod ${spec} ${p} → ${lstr(r.n)}`)}break}
+   case 'chown':case 'chgrp':{const spec=args[0];if(!spec||args.length<2)return E(`${c}: falta o operando`);let o=null,g=null;if(c==='chgrp')g=spec;else{[o,g]=spec.split(':');if(spec.startsWith(':'))o=null}if(o&&!m.users[o])return E(`chown: utilizador inválido: '${spec}'`);if(g&&m.groups[g]===undefined)return E(`${c}: grupo inválido: '${g}'`);for(const p of args.slice(1)){const r=node(p);if(r.err)return r.err;if(!isroot&&(o||r.n.o!==me||(g&&!lmember(m,me,g))))return E(`${c}: a alterar o dono de '${p}': Operação não permitida`);if(o)r.n.o=o;if(g)r.n.g=g;llog(m,`${c} ${spec} ${p}`)}break}
+   case 'getfacl':{const r=node(args[0]||'.');if(r.err)return r.err;const n=r.n;const d=n.m.slice(-3).split('').map(Number);const s=v=>(v&4?'r':'-')+(v&2?'w':'-')+(v&1?'x':'-');P(`# file: ${(args[0]||'.').replace(/^\//,'')}\n# owner: ${n.o}\n# group: ${n.g}\nuser::${s(d[0])}`);Object.entries(n.acl).filter(([k])=>k.startsWith('u:')).forEach(([k,v])=>P(`user:${k.slice(2)}:${s(v)}`));P(`group::${s(d[1])}`);Object.entries(n.acl).filter(([k])=>k.startsWith('g:')).forEach(([k,v])=>P(`group:${k.slice(2)}:${s(v)}`));if(Object.keys(n.acl).length)P('mask::rwx');P(`other::${s(d[2])}`);break}
+   case 'setfacl':{const mi=a.indexOf('-m'),xi=a.indexOf('-x');const spec=a[(mi>=0?mi:xi)+1];const p=a[(mi>=0?mi:xi)+2];if(!spec||!p)return E('Utilização: setfacl -m g:grupo:rx pasta | setfacl -x g:grupo pasta');const r=node(p);if(r.err)return r.err;if(r.n.o!==me&&!isroot)return E(`setfacl: ${p}: Operação não permitida`);const [kind,name,perm]=spec.split(':');const k=(kind==='g'||kind==='group'?'g:':'u:')+name;if(k.startsWith('g:')&&m.groups[name]===undefined)return E(`setfacl: grupo inválido: ${name}`);if(k.startsWith('u:')&&!m.users[name])return E(`setfacl: utilizador inválido: ${name}`);if(xi>=0)delete r.n.acl[k];else{const v=[...(perm||'')].reduce((s,ch)=>s|({r:4,w:2,x:1}[ch]||0),0);r.n.acl[k]=v}llog(m,`setfacl ${a.join(' ')}`);break}
+   case 'useradd':case 'adduser':{if(needRoot())return{out,code:1};const u=args[0];if(!u)return E(`Utilização: ${c} [opções] NOME`);if(!/^[a-z_][a-z0-9_-]{0,31}$/.test(u))return E(`${c}: o nome de utilizador '${u}' não é válido (minúsculas, sem espaços)`);if(m.users[u])return E(`${c}: o utilizador '${u}' já existe`);const gi=a.indexOf('-G');const extra=gi>=0?(a[gi+1]||'').split(',').filter(Boolean):[];const bad=extra.find(g=>m.groups[g]===undefined);if(bad)return E(`${c}: o grupo '${bad}' não existe`);const uid=1001+Object.keys(m.users).filter(x=>m.users[x].uid>=1001).length;m.users[u]={uid,groups:[u,...extra],pw:false,home:'/home/'+u};m.groups[u]=uid;if(has('m')||c==='adduser')lget(m,'/home').c[u]=LD(u,u,'0750',{});llog(m,`${c} ${u}`);if(c==='adduser'){P(`A adicionar o utilizador '${u}' ...\nA adicionar o novo grupo '${u}' (${uid}) ...\nA criar o diretório pessoal '/home/${u}' ...`);return ask?(ask(['Nova palavra-passe:','Redigite a nova palavra-passe:'],v=>{if(v[0]!==v[1]||!v[0])return[{e:1,s:'As palavras-passe não coincidem. passwd: palavra-passe não alterada'}];m.users[u].pw=true;return['passwd: palavra-passe atualizada com sucesso']}),{out,code:0,wait:1}):OK()}break}
+   case 'passwd':{const u=args[0]||me;if(!m.users[u])return E(`passwd: o utilizador '${u}' não existe`);if(u!==me&&!isroot)return E('passwd: Só o root pode alterar a palavra-passe de outro utilizador.');if(!ask){m.users[u].pw=true;P('passwd: palavra-passe atualizada com sucesso');break}ask(['Nova palavra-passe:','Redigite a nova palavra-passe:'],v=>{if(!v[0]||v[0]!==v[1])return[{e:1,s:'As palavras-passe não coincidem.\npasswd: Erro de manipulação do token de autenticação\npasswd: palavra-passe não alterada'}];m.users[u].pw=true;llog(m,`palavra-passe de ${u} definida`);return['passwd: palavra-passe atualizada com sucesso']});return{out,code:0,wait:1}}
+   case 'userdel':case 'deluser':{if(needRoot())return{out,code:1};const u=args[0];if(!m.users[u]||u==='root'||u==='aluno')return E(`${c}: não é possível remover '${u||''}'`);delete m.users[u];if(has('r')||has('remove-home'))delete lget(m,'/home').c[u];llog(m,`${c} ${u}`);break}
+   case 'usermod':{if(needRoot())return{out,code:1};const gi=a.findIndex(x=>/^-a?G$|^-Ga$/.test(x));const u=args[args.length-1];if(!m.users[u])return E(`usermod: o utilizador '${u||''}' não existe`);if(a.includes('-L')){m.users[u].lock=true;llog(m,`conta ${u} bloqueada`);break}if(a.includes('-U')){m.users[u].lock=false;break}if(gi<0)return E('Utilização: usermod -aG grupo utilizador');const gs=(a[gi+1]||'').split(',').filter(Boolean);const bad=gs.find(g=>m.groups[g]===undefined);if(bad)return E(`usermod: o grupo '${bad}' não existe`);const x=m.users[u];if(!a[gi].includes('a'))x.groups=[x.groups[0]];gs.forEach(g=>{if(!x.groups.includes(g))x.groups.push(g)});llog(m,`usermod ${a[gi]} ${gs.join(',')} ${u} → grupos: ${x.groups.join(' ')}`);break}
+   case 'gpasswd':{if(needRoot())return{out,code:1};const op=a[0],u=a[1],g=a[2];if(!['-a','-d'].includes(op)||!u||!g)return E('Utilização: gpasswd -a utilizador grupo | gpasswd -d utilizador grupo');if(!m.users[u])return E(`gpasswd: o utilizador '${u}' não existe`);if(m.groups[g]===undefined)return E(`gpasswd: o grupo '${g}' não existe`);const x=m.users[u];if(op==='-a'){if(!x.groups.includes(g))x.groups.push(g);P(`A adicionar o utilizador ${u} ao grupo ${g}`)}else{x.groups=x.groups.filter(y=>y!==g);P(`A remover o utilizador ${u} do grupo ${g}`)}llog(m,`gpasswd ${op} ${u} ${g}`);break}
+   case 'groupadd':{if(needRoot())return{out,code:1};const g=args[0];if(!g)return E('Utilização: groupadd grupo');if(!/^[a-z_][a-z0-9_-]{0,31}$/.test(g))return E(`groupadd: '${g}' não é um nome de grupo válido`);if(m.groups[g]!==undefined)return E(`groupadd: o grupo '${g}' já existe`);m.groups[g]=1001+Object.values(m.groups).filter(v=>v>=1001&&v<1100).length;llog(m,`groupadd ${g}`);break}
+   case 'groupdel':{if(needRoot())return{out,code:1};const g=args[0];if(m.groups[g]===undefined||['root','sudo','users','aluno','shadow'].includes(g))return E(`groupdel: não é possível remover o grupo '${g||''}'`);delete m.groups[g];Object.values(m.users).forEach(x=>x.groups=x.groups.filter(y=>y!==g));llog(m,`groupdel ${g}`);break}
+   case 'su':{const u=args[0]||'root';if(!m.users[u])return E(`su: o utilizador ${u} não existe`);const go=()=>{m.cwds=m.cwds||[];m.cwds.push(m.cwd);m.stack.push(u);if(a.includes('-')||has('l'))m.cwd=lget(m,m.users[u].home)?m.users[u].home:'/';llog(m,`${me} → su ${u}`);return[]};if(isroot)return{out:go(),code:0};if(!ask)return{out:go(),code:0};ask(['Palavra-passe:'],v=>{if(!m.users[u].pw||!v[0]||m.users[u].lock)return[{e:1,s:'su: Falha de autenticação'}];return go()});return{out,code:0,wait:1}}
+   case 'exit':case 'logout':{if(m.stack.length>1){const u=m.stack.pop();if(m.cwds&&m.cwds.length)m.cwd=m.cwds.pop();llog(m,`${u} saiu (exit)`);break}P('(Nesta bancada a janela fica aberta.)');break}
+   default:return E(`${c}: comando não encontrado`);
+  }
+  return done();
+}
+
+/* ===== utilitários ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const now=()=>new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+function tok(line){const t=[];let cur='',q=null,has=false;for(let i=0;i<line.length;i++){const c=line[i];if(q){if(c===q)q=null;else cur+=c}else if(c==='"'||c==="'"){q=c;has=true}else if(c===' '||c==='\t'){if(cur||has){t.push(cur);cur='';has=false}}else if(c==='>'){if(cur||has){t.push(cur);cur='';has=false}if(line[i+1]==='>'){t.push('>>');i++}else t.push('>')}else cur+=c}if(cur||has)t.push(cur);return t}
+function splitTop(line,re){const parts=[];let cur='',q=null;for(let i=0;i<line.length;i++){const c=line[i];if(q){if(c===q)q=null;cur+=c;continue}if(c==='"'||c==="'"){q=c;cur+=c;continue}const m=line.slice(i).match(re);if(m&&m.index===0){parts.push(cur);cur='';i+=m[0].length-1;continue}cur+=c}parts.push(cur);return parts}
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const words=s=>norm(s).split(/[^a-z0-9]+/).filter(w=>w.length>1);
+
+/* ===== estado ===== */
+const KEY='so-lab-trilhos-v1';
+let ALL={cur:0,id:{a:{nome:'',num:''},b:{nome:'',num:''}},teams:{}};
+try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.teams)ALL=r}catch(e){}
+if(!ALL.id||!ALL.id.a)ALL.id={a:{nome:ALL.id?.nome||'',num:ALL.id?.num||''},b:{nome:'',num:''}};
+let svT;function flush(){clearTimeout(svT);try{localStorage.setItem(KEY,JSON.stringify(ALL))}catch(e){}}
+function save(){clearTimeout(svT);svT=setTimeout(flush,250)}
+addEventListener('pagehide',flush);document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});
+const T=()=>TEAMS[ALL.cur];
+const nn=()=>String(ALL.cur+1).padStart(2,'0');
+function TS(){return ALL.teams[ALL.cur]||(ALL.teams[ALL.cur]={})}
+function LS(id){const s=TS();if(!s[id]){const L=LABS[id];s[id]={phase:'aprender',seen:{},prac:L.init(T(),false),fault:L.init(T(),true),ans:{},ord:{},att:{},diag:'',refl:'',checked:false,done:false}}return s[id]}
+
+/* ===== terminal genérico ===== */
+function makeTerm(el,cfg){
+  const st=cfg.store;st.tx=st.tx||[];st.hist=st.hist||[];el.innerHTML='';el.classList.add('term');if(cfg.win)el.classList.add('pst');
+  const out=document.createElement('div');const row=document.createElement('div');row.className='tin';const pr=document.createElement('span');const inp=document.createElement('input');inp.setAttribute('aria-label','Comando');inp.autocomplete='off';inp.spellcheck=false;inp.setAttribute('autocapitalize','off');row.append(pr,inp);el.append(out,row);
+  let queue=null,vals=[],cb=null,hi=-1;
+  const line=o=>{const d=document.createElement('div');if(o.c!==undefined){(o.p||[]).forEach(x=>{const s=document.createElement('span');s.className=x.c||'';s.textContent=x.t;d.append(s)});d.append(document.createTextNode(o.c))}else{d.textContent=o.o;if(o.e)d.className='er'}out.append(d)};
+  const push=o=>{st.tx.push(o);if(st.tx.length>260)st.tx.splice(0,st.tx.length-260);line(o)};
+  const prompt=()=>{pr.innerHTML='';if(queue){pr.textContent=queue[0]+' ';inp.type='password';return}inp.type='text';cfg.prompt().forEach(x=>{const s=document.createElement('span');s.className=x.c||'';s.textContent=x.t;pr.append(s)})};
+  const ask=(labels,f)=>{queue=labels.slice();vals=[];cb=f};
+  const emit=res=>{(res||[]).forEach(o=>{if(o&&o.clear){st.tx=[];out.innerHTML='';return}push(typeof o==='string'?{o}:{o:o.s,e:o.e})})};
+  st.tx.forEach(line);if(!st.tx.length)push({o:cfg.welcome||'Escrevam help para ver os comandos disponíveis.'});prompt();
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){const v=inp.value;inp.value='';hi=-1;
+      if(queue){push({p:[{t:queue[0]+' '}],c:''});vals.push(v);queue.shift();if(!queue.length){queue=null;const f=cb;cb=null;emit(f(vals))}prompt();cfg.after&&cfg.after();el.scrollTop=el.scrollHeight;return}
+      push({p:cfg.prompt(),c:v});if(v.trim()){st.hist.push(v);if(st.hist.length>150)st.hist.shift()}
+      emit(cfg.run(v,ask));prompt();cfg.after&&cfg.after();save();el.scrollTop=el.scrollHeight}
+    else if(e.key==='ArrowUp'&&!queue){if(!st.hist.length)return;e.preventDefault();hi=hi<0?st.hist.length-1:Math.max(0,hi-1);inp.value=st.hist[hi]}
+    else if(e.key==='ArrowDown'&&!queue){if(hi<0)return;e.preventDefault();hi++;if(hi>=st.hist.length){hi=-1;inp.value=''}else inp.value=st.hist[hi]}
+    else if(e.key==='c'&&e.ctrlKey&&queue){queue=null;cb=null;push({o:'^C'});prompt()}
+  });
+  el.addEventListener('click',()=>{if(!getSelection().toString())inp.focus()});
+  requestAnimationFrame(()=>{el.scrollTop=el.scrollHeight});
+  return{focus:()=>inp.focus({preventScroll:true})};
+}
+
+/* ===== definição dos labs ===== */
+const W5M=t=>{const[A1,A2,B1]=t.u;const fA=WROOT+'\\'+t.fA,fB=WROOT+'\\'+t.fB;return[
+ {t:'Criar as contas',d:`Criem as contas ${A1}, ${A2} e ${B1}, com nome completo e palavra-passe.`,h:`Gestão de Computadores → Utilizadores → Novo utilizador…, ou no Terminal: New-LocalUser -Name ${A1} -FullName "${t.n[0]}"`,ok:m=>t.u.every(u=>m.users[u]&&m.users[u].on&&m.users[u].pw)},
+ {t:'Criar os grupos',d:`Criem os grupos ${t.gA} (${t.lA}: ${A1} e ${A2}) e ${t.gB} (${t.lB}: ${B1}).`,h:`Grupos → Novo grupo…, ou: New-LocalGroup -Name ${t.gA} ; Add-LocalGroupMember -Group ${t.gA} -Member ${A1},${A2}`,ok:m=>m.groups[t.gA]&&m.groups[t.gB]&&[A1,A2].every(u=>m.users[u]?.groups.includes(t.gA))&&m.users[B1]?.groups.includes(t.gB)},
+ {t:'Um só administrador',d:`${A1} gere o computador e passa a administrador. ${A2} e ${B1} ficam contas padrão.`,h:`Propriedades de ${A1} → Membro de → Adicionar «Administradores», ou: net localgroup Administradores ${A1} /add`,ok:m=>wIsAdmin(m,A1)&&!wIsAdmin(m,A2)&&!wIsAdmin(m,B1)},
+ {t:`Proteger a pasta ${t.fA}`,d:`O grupo ${t.gA} pode criar e alterar ficheiros em ${fA}. Mais nenhum utilizador comum lhe pode aceder.`,h:`Propriedades → Avançadas → Desativar herança (converter) → remover Utilizadores → Adicionar ${t.gA} com Modificar. Ou: icacls ${fA} /inheritance:d ; icacls ${fA} /remove Utilizadores ; icacls ${fA} /grant ${t.gA}:(OI)(CI)M`,ok:m=>m.fs[fA]&&wEff(m,A2,fA).has('w')&&!wEff(m,B1,fA).has('r')},
+ {t:`Configurar a pasta ${t.fB}`,d:`O grupo ${t.gB} cria e altera ficheiros em ${fB}. O grupo ${t.gA} só pode ler.`,h:`Desativar herança, remover Utilizadores, ${t.gB} com Modificar e ${t.gA} com Ler e executar.`,ok:m=>m.fs[fB]&&wEff(m,B1,fB).has('w')&&wEff(m,A2,fB).has('r')&&!wEff(m,A2,fB).has('w')},
+ {t:'Testar com as contas',d:`Iniciem sessão como ${A2} e criem um documento em ${t.fA}. Depois, como ${B1}, confirmem que ${t.fA} fica inacessível.`,h:'Iniciar → Mudar de utilizador… e depois Explorador de Ficheiros.',ok:m=>m.tests.wA&&m.tests.dB},
+ {t:'Ver o UAC em ação',d:`Com a sessão de uma conta padrão, abram a Gestão de Computadores e observem o pedido do UAC.`,h:'O UAC pede as credenciais de um administrador.',ok:m=>!!m.flags.uac},
+ {t:'Desafio: PowerShell',d:'Façam pelo menos uma das tarefas anteriores no Terminal (PowerShell) em vez da janela gráfica.',h:'Por exemplo: New-LocalGroup, Add-LocalGroupMember ou icacls.',opt:1,ok:m=>!!m.flags.psChange}]};
+const L5M=t=>{const[A1,A2,B1]=t.u;const fA='/srv/empresa/'+t.fA,fB='/srv/empresa/'+t.fB;return[
+ {t:'Criar os grupos',d:`Criem os grupos ${t.gA} e ${t.gB}.`,h:`sudo groupadd ${t.gA}`,ok:m=>m.groups[t.gA]!==undefined&&m.groups[t.gB]!==undefined},
+ {t:'Criar as contas',d:`Criem ${A1}, ${A2} e ${B1}, cada um com diretório pessoal e palavra-passe.`,h:`sudo useradd -m ${A1} ; sudo passwd ${A1}   (ou sudo adduser ${A1})`,ok:m=>t.u.every(u=>m.users[u]&&m.users[u].pw&&lget(m,'/home/'+u))},
+ {t:'Juntar aos grupos',d:`${A1} e ${A2} pertencem a ${t.gA}; ${B1} pertence a ${t.gB}.`,h:`sudo usermod -aG ${t.gA} ${A1}   (não esqueçam o -a)`,ok:m=>[A1,A2].every(u=>lmember(m,u,t.gA))&&lmember(m,B1,t.gB)},
+ {t:'Só um administrador',d:`${A1} pode usar sudo; ${A2} e ${B1} não.`,h:`sudo usermod -aG sudo ${A1}`,ok:m=>lmember(m,A1,'sudo')&&!lmember(m,A2,'sudo')&&!lmember(m,B1,'sudo')},
+ {t:`Proteger ${fA}`,d:`A pasta pertence ao grupo ${t.gA}, que tem rwx. Os outros não têm acesso nenhum.`,h:`sudo chgrp ${t.gA} ${fA} ; sudo chmod 770 ${fA}`,ok:m=>{const n=lget(m,fA);return n&&n.g===t.gA&&n.m.slice(-2,-1)==='7'&&n.m.slice(-1)==='0'&&!Object.keys(n.acl).length}},
+ {t:`Configurar ${fB}`,d:`O grupo ${t.gB} tem rwx. Os membros de ${t.gA} podem entrar e ler, mas não escrever.`,h:`sudo chgrp ${t.gB} ${fB} ; sudo chmod 775 ${fB}`,ok:m=>{const n=lget(m,fB);if(!n)return false;const p=lperm(m,n,A2);return n.g===t.gB&&n.m.slice(-2,-1)==='7'&&(p&5)===5&&!(p&2)}},
+ {t:'Testar com su',d:`Com su - ${A2}, criem um ficheiro em ${t.fA}. Depois, com su - ${B1}, confirmem que não conseguem entrar lá.`,h:`su - ${A2} ; touch ${fA}/teste.txt ; exit ; su - ${B1} ; cd ${fA}`,ok:m=>m.tests.wA&&m.tests.dB},
+ {t:'Testar o sudo',d:`Confirmem que ${B1} não consegue usar sudo e que ${A1} consegue.`,h:`su - ${B1} ; sudo whoami ; exit ; su - ${A1} ; sudo whoami`,ok:m=>m.tests.sD&&m.tests.sOK},
+ {t:'Desafio: setgid e ACL',d:`Os ficheiros novos em ${t.fA} devem herdar o grupo (setgid). Em ${t.fB}, os outros não têm acesso e ${t.gA} lê através de uma ACL.`,h:`sudo chmod g+s ${fA} ; sudo chmod 770 ${fB} ; sudo setfacl -m g:${t.gA}:rx ${fB}`,opt:1,ok:m=>{const a=lget(m,fA),b=lget(m,fB);return a&&b&&(Number(a.m.padStart(4,'0')[0])&2)&&b.m.slice(-1)==='0'&&(b.acl['g:'+t.gA]&5)===5}}]};
+const LABS={
+ w5:{code:'W5',track:'w',title:'Contas, UAC e permissões NTFS',goal:'Criar contas locais e grupos, aplicar o princípio do menor privilégio com permissões NTFS e compreender o UAC.',env:'win',init:wInit,missions:W5M,
+   ticket:t=>`«Bom dia. Sou ${t.n[1].split(' ')[0]}, da ${t.lA.toLowerCase()} da ${t.emp}. Consigo abrir a pasta ${t.fA}, mas quando tento guardar um ficheiro aparece "Acesso negado". O ${t.u[0]} consegue gravar sem problemas.»`,
+   fixed:(m,t)=>{const fA=WROOT+'\\'+t.fA;return wEff(m,t.u[1],fA).has('w')&&wEff(m,t.u[0],fA).has('w')&&!wEff(m,t.u[2],fA).has('r')},faultHint:'Comparem as permissões efetivas do utilizador com as do grupo. Vejam as entradas «Negar» em Propriedades → Segurança → Avançadas, ou com icacls.',refl:'Na mesma tarefa (proteger uma pasta para um grupo), comparem o modelo de permissões do Windows com o do Ubuntu. Qual é mais flexível e qual é mais simples de verificar? Justifiquem com exemplos deste lab.'},
+ l5:{code:'L5',track:'l',title:'Utilizadores, grupos e permissões',goal:'Gerir utilizadores e grupos, aplicar permissões rwx e ACL, e usar su e sudo de forma segura.',env:'bash',init:lInit,missions:L5M,
+   ticket:t=>`«Sou ${t.n[1].split(' ')[0]}, da ${t.emp}. Pertenço ao grupo ${t.gA}, mas quando faço cd /srv/empresa/${t.fA} aparece "Permissão recusada". Ontem funcionava.»`,
+   fixed:(m,t)=>{const n=lget(m,'/srv/empresa/'+t.fA);return n&&n.g===t.gA&&lperm(m,n,t.u[1])===7&&n.m.slice(-1)==='0'},faultHint:'Vejam as permissões da pasta com ls -ld. Lembrem-se do que significa o x num diretório.',refl:'Na mesma tarefa (proteger uma pasta para um grupo), comparem o modelo rwx do Ubuntu com as ACL do Windows. Qual é mais flexível e qual é mais simples de verificar? Justifiquem com exemplos deste lab.'}
+};
+const PHASES=[['aprender','Aprender'],['praticar','Praticar'],['avaria','Avaria'],['verificar','Verificar'],['comparar','Comparar']];
+
+/* ===== estado das fases ===== */
+function misState(id){const L=LABS[id],s=LS(id);return L.missions(T()).map(x=>{let ok=false;try{ok=!!x.ok(s.prac)}catch(e){}return{...x,done:ok}})}
+function phaseDone(id,ph){const L=LABS[id],s=LS(id);if(ph==='aprender')return !!s.seen.aprender;if(ph==='praticar')return misState(id).filter(x=>!x.opt).every(x=>x.done);if(ph==='avaria'){let ok=false;try{ok=L.fixed(s.fault,T())}catch(e){}return ok&&words(s.diag).length>=25}if(ph==='verificar')return QUIZ[id].every((q,j)=>s.ans[j]===0);if(ph==='comparar')return words(s.refl).length>=40;return false}
+function labDone(id){return PHASES.every(([p])=>phaseDone(id,p))}
+
+/* ===== página inicial ===== */
+function renderHome(){
+  const st=(code)=>{const id=ACTIVE[code];if(id)return labDone(id)?'done':'act';return ELSEWHERE[code]?'else':'soon'};
+  const line=k=>{const tr=TRACKS[k];return `<div class="track" style="--tc:${tr.col}"><div class="tname"><b>Trilho ${tr.name}</b><span>${k==='w'?'Interface gráfica + PowerShell':'Terminal bash'}</span></div><ol class="stations">${tr.labs.map(([c,n])=>{const s=st(c);const id=ACTIVE[c];return `<li class="${s}">${id?`<a href="#${id}">`:ELSEWHERE[c]?`<a href="${ELSEWHERE[c][1]}">`:'<span>'}<i>${s==='done'?'✓':c}</i><b>${esc(n)}</b><small>${s==='done'?'Concluído':s==='act'?'Disponível':s==='else'?esc(ELSEWHERE[c][0]):'Em preparação'}</small>${id||ELSEWHERE[c]?'</a>':'</span>'}</li>`}).join('')}</ol></div>`};
+  $('#view').innerHTML=`<section class="home"><div class="hero"><div><h1>Dois sistemas, um percurso</h1><p class="lead">Cada trilho tem a sua máquina simulada. O que fazem num lab fica guardado para o seguinte. Em cada lab: aprender, praticar, resolver uma avaria, verificar e comparar com o outro sistema.</p></div>
+    <form class="idf" onsubmit="return false"><label>Aluno A · nome<input id="ianome" value="${esc(ALL.id.a.nome)}" autocomplete="off"></label><label>N.º<input id="ianum" value="${esc(ALL.id.a.num)}" inputmode="numeric" autocomplete="off"></label><label>Aluno B · nome<input id="ibnome" value="${esc(ALL.id.b.nome)}" autocomplete="off"></label><label>N.º<input id="ibnum" value="${esc(ALL.id.b.num)}" inputmode="numeric" autocomplete="off"></label><label>Equipa<select id="iteam">${TEAMS.map((t,i)=>`<option value="${i}"${i===ALL.cur?' selected':''}>Equipa ${String(i+1).padStart(2,'0')} · ${esc(t.emp)}</option>`).join('')}</select></label><p class="small">A equipa define o cenário: empresa, utilizadores, grupos e pastas.</p></form></div>
+    <div class="common"><a class="cl" href="bancada/index.html#lab01"><span class="cdot">C1</span> Interpretar o equipamento</a> <a class="cl" href="bancada/index.html#lab02"><span class="cdot">C2</span> Planear a VM</a> <span class="small">· comuns aos dois trilhos, na Bancada</span></div>
+    ${line('w')}${line('l')}
+    <div class="common"><span class="cdot">P1</span> Lab ponte: a mesma tarefa nos dois sistemas <span class="small">· em preparação</span></div>
+    <div class="scen"><b>Cenário da equipa ${nn()}: ${esc(T().emp)}</b><span>Responsável: ${esc(T().n[0])} (${esc(T().u[0])}) · ${esc(T().lA)}: ${esc(T().u[0])}, ${esc(T().u[1])} · ${esc(T().lB)}: ${esc(T().u[2])} · Pastas: ${esc(T().fA)} e ${esc(T().fB)}</span></div></section>`;
+  [['ianome','a','nome'],['ianum','a','num'],['ibnome','b','nome'],['ibnum','b','num']].forEach(([i,w,k])=>$('#'+i).oninput=e=>{ALL.id[w][k]=e.target.value;save()});
+  $('#iteam').onchange=e=>{ALL.cur=+e.target.value;save();renderHome()};
+}
+
+/* ===== lab ===== */
+function renderLab(id){
+  const L=LABS[id],s=LS(id),tr=TRACKS[L.track],t=T();
+  document.documentElement.style.setProperty('--tc',tr.col);
+  $('#view').innerHTML=`<section class="lab" style="--tc:${tr.col}"><div class="lhead"><div><div class="kick">Trilho ${tr.name} · ${L.code} · Equipa ${nn()} · ${esc(t.emp)}</div><h2>${esc(L.title)}${labDone(id)?'<span class="badge">Concluído</span>':''}</h2><p class="lead">${esc(L.goal)}</p></div></div>
+   <nav class="phases" aria-label="Fases do laboratório">${PHASES.map(([k,n],i)=>`<button data-ph="${k}" class="${s.phase===k?'on':''} ${phaseDone(id,k)?'ok':''}"><i>${phaseDone(id,k)?'✓':i+1}</i>${n}</button>`).join('')}</nav><div id="phase"></div></section>`;
+  $('#view').querySelectorAll('[data-ph]').forEach(b=>b.onclick=()=>{s.phase=b.dataset.ph;save();renderLab(id);$('.phases').scrollIntoView({block:'start'})});
+  const P=$('#phase');
+  if(s.phase==='aprender'){s.seen.aprender=true;save();P.innerHTML=(id==='w5'?learnW5(t):learnL5(t))+nextBtn('praticar');bindLearn(id);}
+  if(s.phase==='praticar'){P.innerHTML=`<div class="split"><div><h3>Missões</h3><p class="small">Verificadas automaticamente pelo estado do sistema: qualquer caminho correto conta.</p><ol class="mis" id="mis"></ol><button class="ghost" id="reset">Repor esta máquina</button></div><div><div id="env" class="envbox"></div></div></div>${nextBtn('avaria')}`;mountEnv(id,'prac');paintMis(id);
+    $('#reset').onclick=e=>{const b=e.target;if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Confirmar: apagar o que foi feito';return}s.prac=L.init(t,false);save();renderLab(id)}}
+  if(s.phase==='avaria'){P.innerHTML=`<div class="split"><div><div class="ticket"><b>Pedido de apoio #${100+ALL.cur*7}</b><p>${esc(L.ticket(t))}</p></div><p class="small">A máquina desta fase é outra: já tem as contas e as pastas configuradas, com um problema escondido. Corrijam-no sem dar mais acesso do que o necessário.</p><details><summary>Pista</summary><p class="small">${esc(L.faultHint)}</p></details><label class="l" for="diag">Diagnóstico: causa, como a encontraram e o que alteraram (mínimo 25 palavras)</label><textarea id="diag">${esc(s.diag)}</textarea><div class="small" id="dcount"></div><div id="fstat" class="panel"></div><button class="ghost" id="freset">Repor a máquina avariada</button></div><div><div id="env" class="envbox"></div></div></div>${nextBtn('verificar')}`;
+    mountEnv(id,'fault');const upd=()=>{let ok=false;try{ok=L.fixed(s.fault,t)}catch(e){}const w=words(s.diag).length;$('#dcount').textContent=`${w} palavras`;$('#fstat').className='panel '+(ok&&w>=25?'done':'todo');$('#fstat').innerHTML=ok?(w>=25?'<b>Avaria resolvida e diagnóstico registado.</b>':'<b>Avaria resolvida.</b> Falta completar o diagnóstico.'):'<b>Ainda por resolver.</b> O utilizador continua sem o acesso de que precisa, ou alguém ficou com acesso a mais.';refreshPhases(id)};
+    $('#diag').oninput=e=>{s.diag=e.target.value;save();upd()};s.__upd=upd;upd();$('#freset').onclick=e=>{const b=e.target;if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Confirmar';return}s.fault=L.init(t,true);save();renderLab(id)}}
+  if(s.phase==='verificar'){P.innerHTML=`<div class="narrow"><div id="quiz"></div><button id="qcheck">Verificar respostas</button><span id="qres" class="small" style="margin-left:10px"></span></div>${nextBtn('comparar')}`;paintQuiz(id)}
+  if(s.phase==='comparar'){const other=L.track==='w'?'l5':'w5';P.innerHTML=`<div class="narrow"><p>A mesma tarefa nos dois sistemas. Usem a tabela para ligar o que aprenderam neste lab ao lab ${LABS[other].code} do outro trilho.</p><div class="scroll"><table class="cmp"><thead><tr><th>Tarefa</th><th class="cw">Windows 11</th><th class="cl">Ubuntu 24.04</th></tr></thead><tbody>${COMPARE.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</tbody></table></div><label class="l" for="refl">${esc(L.refl)} (mínimo 40 palavras)</label><textarea id="refl">${esc(s.refl)}</textarea><div class="small" id="rcount"></div><p><a href="#${other}">Ir para o ${LABS[other].code}: ${esc(LABS[other].title)} →</a></p><div id="lstat" class="panel"></div></div>`;
+    const up=()=>{$('#rcount').textContent=words(s.refl).length+' palavras';const miss=PHASES.filter(([p])=>!phaseDone(id,p)).map(([,n])=>n);$('#lstat').className='panel '+(miss.length?'todo':'done');$('#lstat').innerHTML=miss.length?`<b>Para concluir o lab falta:</b> ${miss.join(', ')}.`:'<b>Laboratório concluído.</b> O relatório já inclui tudo.';refreshPhases(id)};$('#refl').oninput=e=>{s.refl=e.target.value;save();up()};up()}
+  $('#view').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{s.phase=b.dataset.go;save();renderLab(id);$('.phases').scrollIntoView({block:'start'})});
+}
+function nextBtn(ph){const n=PHASES.find(p=>p[0]===ph);return `<div class="next"><button data-go="${ph}">Seguinte: ${n[1]} →</button></div>`}
+function refreshPhases(id){document.querySelectorAll('.phases [data-ph]').forEach((b,i)=>{const ok=phaseDone(id,b.dataset.ph);b.classList.toggle('ok',ok);b.querySelector('i').textContent=ok?'✓':i+1});const h=$('.lhead h2');if(h&&labDone(id)&&!h.querySelector('.badge'))h.insertAdjacentHTML('beforeend','<span class="badge">Concluído</span>');if(labDone(id)&&!LS(id).done){LS(id).done=true;LS(id).doneAt=new Date().toLocaleString('pt-PT');save()}}
+function paintMis(id){const el=$('#mis');if(!el)return;const ms=misState(id);const first=ms.findIndex(x=>!x.done&&!x.opt);el.innerHTML=ms.map((x,i)=>`<li class="${x.done?'done':''} ${i===first?'cur':''} ${x.opt?'xopt':''}"><b>${esc(x.t)}</b>${esc(x.d)}<details><summary>Pista</summary><code>${esc(x.h)}</code></details></li>`).join('');refreshPhases(id)}
+function mountEnv(id,which){const L=LABS[id],s=LS(id),m=s[which],el=$('#env');const after=()=>{save();if(which==='prac')paintMis(id);else s.__upd&&s.__upd()};
+  if(L.env==='win'){el.className='envbox win';const host=document.createElement('div');el.innerHTML='';el.append(host);host.addEventListener('click',e=>wClick(host,e));wRender(host,m,after)}
+  else{el.className='envbox bash';makeTerm(el,{store:m,welcome:`Ubuntu 24.04.3 LTS (simulado) · ${m.host} · equipa ${nn()}\nSessão: aluno (administrador, grupo sudo). Escrevam help.`,prompt:()=>{const u=lcur(m);const home=m.users[u]?.home||'/';const p=m.cwd===home?'~':m.cwd.startsWith(home+'/')?'~'+m.cwd.slice(home.length):m.cwd;return[{t:`${u}@${m.host}`,c:'pu'},{t:':'},{t:p,c:'pp'},{t:u==='root'?'# ':'$ '}]},run:(l,ask)=>lRun(m,l,ask),after})}}
+function paintQuiz(id){const s=LS(id),Q=QUIZ[id];
+  const ord=j=>{if(!s.ord[j]){const a=[...Array(Q[j][1].length).keys()];for(let k=a.length-1;k>0;k--){const x=Math.floor(Math.random()*(k+1));[a[k],a[x]]=[a[x],a[k]]}s.ord[j]=a}return s.ord[j]};
+  $('#quiz').innerHTML=Q.map((q,j)=>`<fieldset><legend>${j+1}. ${esc(q[0])}</legend>${ord(j).map(k=>`<label class="opt"><input type="radio" name="q${j}" value="${k}"${s.ans[j]===k?' checked':''}><span>${esc(q[1][k])}</span></label>`).join('')}<p class="fb" id="fb${j}"></p></fieldset>`).join('');
+  const fb=j=>{const p=$('#fb'+j),a=s.ans[j];if(!s.checked){p.textContent='';return}if(a===undefined){p.innerHTML='<span class="bad">Escolham uma opção.</span>';return}if(a===0){p.innerHTML=`<span class="good">Certo.</span> ${esc(Q[j][2])}`;return}p.innerHTML=`<span class="bad">Ainda não.</span> ${(s.att[j]||0)>=2?'Explicação: '+esc(Q[j][2]):'Revejam a fase Aprender e tentem outra vez.'}`};
+  Q.forEach((q,j)=>{document.querySelectorAll(`input[name=q${j}]`).forEach(x=>x.onchange=()=>{s.ans[j]=+x.value;$('#fb'+j).textContent='';save()});fb(j)});
+  $('#qcheck').onclick=()=>{s.checked=true;Q.forEach((q,j)=>{if(s.ans[j]!==undefined&&s.ans[j]!==0)s.att[j]=(s.att[j]||0)+1;fb(j)});const ok=Q.filter((q,j)=>s.ans[j]===0).length;$('#qres').textContent=`${ok} de ${Q.length} certas.`;save();refreshPhases(id)};
+}
+
+/* ===== Aprender: conteúdos e interativos ===== */
+function learnW5(t){return `<div class="learn">
+ <div class="lcard"><h3>Contas locais</h3><p>Cada pessoa tem a sua conta. Assim, cada uma tem os seus ficheiros e as suas definições, e o sistema regista quem fez o quê.</p><div class="scroll"><table><thead><tr><th>Tipo</th><th>O que pode fazer</th><th>Quando usar</th></tr></thead><tbody><tr><td><b>Administrador</b></td><td>Instalar programas, criar contas, alterar permissões e definições do sistema</td><td>Só para quem gere o PC (aqui: ${esc(t.u[0])})</td></tr><tr><td><b>Padrão</b></td><td>Usar programas e gerir os próprios ficheiros</td><td>Trabalho do dia a dia</td></tr><tr><td><b>Convidado</b></td><td>Acesso muito limitado, sem palavra-passe</td><td>Vem desativada; deve continuar assim</td></tr></tbody></table></div></div>
+ <div class="lcard"><h3>Grupos</h3><p>As permissões dão-se a <b>grupos</b>, não a pessoas. Quando alguém entra para a ${esc(t.lA.toLowerCase())}, basta juntá-lo ao grupo ${esc(t.gA)}, sem mexer nas pastas.</p><p>Grupos incorporados: <b>Administradores</b> (controlo total do PC), <b>Utilizadores</b> (todas as contas criadas entram aqui) e <b>Convidados</b>.</p></div>
+ <div class="lcard"><h3>UAC: Controlo de Conta de Utilizador</h3><p>Mesmo um administrador trabalha com privilégios normais. Quando uma ação precisa de mais, o Windows escurece o ecrã e pergunta:</p><ul><li><b>Administrador:</b> só tem de confirmar (Sim / Não).</li><li><b>Conta padrão:</b> tem de escrever o nome e a palavra-passe de um administrador.</li></ul></div>
+ <div class="lcard"><h3>Permissões NTFS</h3><div class="scroll"><table><thead><tr><th>Permissão</th><th>Permite</th></tr></thead><tbody><tr><td>Controlo total</td><td>Tudo, incluindo alterar permissões e tomar posse</td></tr><tr><td>Modificar</td><td>Ler, criar, alterar e eliminar</td></tr><tr><td>Ler e executar</td><td>Abrir ficheiros e executar programas</td></tr><tr><td>Leitura</td><td>Ver o conteúdo</td></tr><tr><td>Escrita</td><td>Criar ficheiros e gravar alterações</td></tr></tbody></table></div><ul><li><b>Herança:</b> por omissão, uma subpasta recebe as permissões da pasta-mãe (aparecem a cinzento). Para as mudar, desativa-se a herança e convertem-se em explícitas.</li><li><b>Negar prevalece:</b> uma entrada «Negar» explícita ganha a qualquer «Permitir».</li><li><b>Permissões efetivas:</b> juntam-se as do utilizador e as de todos os seus grupos; depois retira-se o que estiver negado.</li></ul></div>
+ <div class="lcard wide"><h3>Experimentem: permissões efetivas</h3><p class="small">Liguem e desliguem entradas da lista de controlo de acesso (ACL) da pasta ${esc(t.fA)} e vejam o que cada pessoa consegue fazer.</p><div class="calc"><div><b>Entradas da ACL</b>${[['adm','Administradores · Permitir · Controlo total',1],['ga',`${t.gA} · Permitir · Modificar`,1],['us','Utilizadores · Permitir · Ler e executar (herdada)',1],['dn',`${t.u[1]} · Negar · Escrita`,0]].map(([k,l,on])=>`<label class="chk"><input type="checkbox" data-ace="${k}"${on?' checked':''}> ${esc(l)}</label>`).join('')}</div><div><b>Resultado</b><div id="calcout"></div></div></div></div>
+ </div>`}
+function learnL5(t){return `<div class="learn">
+ <div class="lcard"><h3>Contas no Ubuntu</h3><p>Cada utilizador é uma linha de <code>/etc/passwd</code>:</p><pre class="anat">${esc(t.u[1])}:x:1002:1002::/home/${esc(t.u[1])}:/bin/bash</pre><ul class="small"><li><b>${esc(t.u[1])}</b>: nome · <b>x</b>: a palavra-passe está em /etc/shadow</li><li><b>1002</b>: UID (número do utilizador) · <b>1002</b>: GID do grupo principal</li><li><b>/home/${esc(t.u[1])}</b>: diretório pessoal · <b>/bin/bash</b>: shell</li></ul><p>Os grupos estão em <code>/etc/group</code>. Um utilizador tem um grupo principal e pode ter grupos secundários.</p></div>
+ <div class="lcard"><h3>root, sudo e su</h3><ul><li><b>root</b> (UID 0) pode tudo. No Ubuntu não se inicia sessão como root.</li><li><b>sudo comando</b> executa um comando como root, com a palavra-passe do próprio utilizador. Só funciona para quem está no grupo <b>sudo</b>.</li><li><b>su - nome</b> muda para outro utilizador, com a palavra-passe dele. Serve para testar permissões. <code>exit</code> volta atrás.</li></ul></div>
+ <div class="lcard"><h3>Dono, grupo e outros</h3><pre class="anat">drwxrwx--- 2 root ${esc(t.gA)} 4096 ${esc(t.fA)}</pre><p>Cada ficheiro tem um <b>dono</b> e um <b>grupo</b>. As 9 letras são três blocos de rwx: dono, grupo e outros. O sistema usa o primeiro bloco que se aplica a quem pede acesso.</p><ul><li><code>chown dono:grupo pasta</code> e <code>chgrp grupo pasta</code> mudam o dono e o grupo.</li><li><code>chmod 770 pasta</code> ou <code>chmod g+rwx,o-rwx pasta</code> mudam as permissões.</li><li><b>setgid</b> (<code>chmod g+s</code>): os ficheiros novos herdam o grupo da pasta.</li><li><b>ACL</b> (<code>setfacl -m g:grupo:rx pasta</code>): dá permissões a mais grupos ou utilizadores, como no Windows.</li></ul></div>
+ <div class="lcard"><h3>r, w e x não são iguais em pastas</h3><div class="scroll"><table><thead><tr><th></th><th>Num ficheiro</th><th>Numa pasta</th></tr></thead><tbody><tr><td><b>r</b> (4)</td><td>ler o conteúdo</td><td>listar os nomes (ls)</td></tr><tr><td><b>w</b> (2)</td><td>alterar o conteúdo</td><td>criar, apagar e mudar o nome de ficheiros</td></tr><tr><td><b>x</b> (1)</td><td>executar como programa</td><td>entrar (cd) e aceder aos ficheiros</td></tr></tbody></table></div></div>
+ <div class="lcard wide"><h3>Experimentem: calculadora de permissões</h3><div class="calc"><div><table class="rwx"><thead><tr><th></th><th>r</th><th>w</th><th>x</th></tr></thead><tbody>${['Dono','Grupo','Outros'].map((w,i)=>`<tr><td>${w}</td>${[4,2,1].map(b=>`<td><input type="checkbox" data-rwx="${i}-${b}" aria-label="${w} ${b===4?'r':b===2?'w':'x'}"></td>`).join('')}</tr>`).join('')}</tbody></table><label class="chk"><input type="checkbox" id="sgid"> setgid (g+s)</label><label>Octal<input id="oct" value="0770" inputmode="numeric" style="width:7em"></label></div><div><b>Resultado</b><div id="rwxout"></div></div></div></div>
+ </div>`}
+function bindLearn(id){const t=T();
+  if(id==='w5'){const calc=()=>{const on=k=>$(`[data-ace="${k}"]`).checked;const ppl=[[t.u[0],[t.gA,'Utilizadores','Administradores']],[t.u[1],[t.gA,'Utilizadores']],[t.u[2],[t.gB,'Utilizadores']]];const rows=ppl.map(([u,gs])=>{let al='',de='';if(on('adm')&&gs.includes('Administradores'))al+='rxwdp';if(on('ga')&&gs.includes(t.gA))al+='rxwd';if(on('us'))al+='rx';if(on('dn')&&u===t.u[1])de+='w';const r=new Set([...al].filter(c=>!de.includes(c)));const f=(c,l)=>`<span class="${r.has(c)?'good':'bad'}">${r.has(c)?'✓':'✗'} ${l}</span>`;return `<div class="pres"><b>${esc(u)}</b> <span class="small">(${gs.join(', ')})</span><div>${f('r','Ler')} ${f('w','Escrever')} ${f('d','Eliminar')} ${f('p','Alterar permissões')}</div></div>`}).join('');$('#calcout').innerHTML=rows+`<p class="small">${on('us')?`Com «Utilizadores» ativo, até ${esc(t.u[2])} consegue ler a pasta: é por isso que se desativa a herança e se remove esse grupo.`:`Sem «Utilizadores», só quem tem entradas próprias acede.`}${on('dn')?` O Negar retira a escrita a ${esc(t.u[1])}, apesar do grupo ter Modificar.`:''}</p>`};document.querySelectorAll('[data-ace]').forEach(x=>x.onchange=calc);calc()}
+  if(id==='l5'){const boxes=[...document.querySelectorAll('[data-rwx]')];const from=v=>{const d=v.padStart(4,'0').split('').map(Number);$('#sgid').checked=!!(d[0]&2);boxes.forEach(b=>{const[i,bit]=b.dataset.rwx.split('-').map(Number);b.checked=!!(d[i+1]&bit)})};
+    const show=()=>{const d=[0,1,2].map(i=>boxes.filter(b=>b.dataset.rwx.startsWith(i+'-')&&b.checked).reduce((s,b)=>s+Number(b.dataset.rwx.split('-')[1]),0));const sp=$('#sgid').checked?2:0;$('#oct').value=String(sp)+d.join('');const sym=d.map((v,i)=>(v&4?'r':'-')+(v&2?'w':'-')+(i===1&&sp?(v&1?'s':'S'):(v&1?'x':'-'))).join('');
+      const who=[['o dono',d[0]],[`o grupo (${t.gA})`,d[1]],['os outros',d[2]]].map(([w,v])=>`<li><b>${w}</b>: ${v===0?'sem acesso':!(v&1)?'não consegue entrar na pasta'+(v&4?' (vê os nomes, mas não abre nada)':''):(v&2?'entra, lê e cria/apaga ficheiros':v&4?'entra e lê':'entra, mas não lista')}</li>`).join('');
+      $('#rwxout').innerHTML=`<p class="big"><code>d${sym}</code> = <code>${sp}${d.join('')}</code></p><p class="small">Numa pasta, com estas permissões:</p><ul>${who}</ul><p class="small">Comando: <code>chmod ${sp?sp:''}${d.join('')} pasta</code>${sp?' · os ficheiros novos herdam o grupo':''}</p>`};
+    boxes.forEach(b=>b.onchange=show);$('#sgid').onchange=show;$('#oct').oninput=e=>{if(/^[0-7]{3,4}$/.test(e.target.value)){from(e.target.value);show()}};from('0770');show()}}
+
+/* ===== relatório ===== */
+function report(){const L=[],A=s=>L.push(s);const t=T();
+  A('SO Lab · Trilhos · Relatório');A(`Aluno A: ${ALL.id.a.nome||'(sem nome)'} · N.º ${ALL.id.a.num||'—'}`);A(`Aluno B: ${ALL.id.b.nome||'(sem nome)'} · N.º ${ALL.id.b.num||'—'}`);A(`Equipa ${nn()} (${t.emp})`);A(`Gerado em ${new Date().toLocaleString('pt-PT')}`);
+  Object.keys(LABS).forEach(id=>{const Lb=LABS[id],s=TS()[id];A('');A(`== ${Lb.code} · ${Lb.title} (trilho ${TRACKS[Lb.track].name}) ==`);if(!s){A('Por iniciar.');return}
+    A(`Estado: ${labDone(id)?'CONCLUÍDO'+(s.doneAt?' em '+s.doneAt:''):'em curso'} · fases: ${PHASES.map(([p,n])=>`${n} ${phaseDone(id,p)?'✓':'—'}`).join(' · ')}`);
+    A('Missões:');misState(id).forEach(x=>A(`  [${x.done?'x':' '}] ${x.t}${x.opt?' (desafio)':''}`));
+    let ok=false;try{ok=Lb.fixed(s.fault,t)}catch(e){}A(`Avaria: ${ok?'resolvida':'por resolver'}`);A('Diagnóstico: '+(s.diag.trim()||'(sem resposta)'));
+    A(`Perguntas: ${QUIZ[id].map((q,j)=>`${j+1} ${s.ans[j]===0?'certa':s.ans[j]===undefined?'—':'errada'}${s.att[j]?` (${s.att[j]} erro${s.att[j]>1?'s':''})`:''}`).join(' · ')}`);
+    A('Comparação: '+(s.refl.trim()||'(sem resposta)'));
+    A('Registo de ações (prática):');s.prac.log.slice(-25).forEach(x=>A('  '+x));if(s.prac.hist?.length){A('Últimos comandos (prática):');s.prac.hist.slice(-20).forEach(x=>A('  > '+x))}
+    A('Registo de ações (avaria):');s.fault.log.slice(-15).forEach(x=>A('  '+x));if(s.fault.hist?.length){A('Últimos comandos (avaria):');s.fault.hist.slice(-12).forEach(x=>A('  > '+x))}});
+  return L.join('\n')}
+function renderReport(){$('#view').innerHTML=`<section class="narrow"><h2>Relatório</h2><p class="lead">Inclui a identificação, o estado das fases, as missões, a avaria, as respostas e o registo de ações e comandos.</p><div class="row"><button id="rcopy">Copiar relatório</button><button class="ghost" id="rdl">Descarregar (.txt)</button><span id="rmsg" class="small"></span></div><pre class="rep" id="rep"></pre></section>`;$('#rep').textContent=report();
+  $('#rcopy').onclick=async()=>{try{await navigator.clipboard.writeText(report());$('#rmsg').textContent='Copiado.'}catch(e){const r=document.createRange();r.selectNodeContents($('#rep'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('#rmsg').textContent='Selecionado: usem Ctrl+C.'}};
+  $('#rdl').onclick=()=>{try{const u=URL.createObjectURL(new Blob([report()],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download=`relatorio-trilhos-eq${nn()}-${([ALL.id.a.num,ALL.id.b.num].filter(Boolean).join('-').replace(/[^\w-]+/g,'')||'alunos')}.txt`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);$('#rmsg').textContent='Se a transferência não começar, usem «Copiar relatório».'}catch(e){$('#rmsg').textContent='Transferência bloqueada: usem «Copiar relatório».'}}}
+
+/* ===== navegação ===== */
+function route(){const h=location.hash.slice(1);document.querySelectorAll('.topnav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+(h||'inicio')));document.documentElement.style.removeProperty('--tc');
+  if(LABS[h])renderLab(h);else if(h==='relatorio')renderReport();else renderHome();scrollTo(0,0)}
+addEventListener('hashchange',route);
+route();
+
+
+}
+</script>
+</body>
+</html>

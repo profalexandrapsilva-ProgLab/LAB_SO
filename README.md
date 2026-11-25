@@ -14,18 +14,17 @@ Laboratórios práticos de **Sistemas Operativos** que correm no navegador, sem 
 
 Todas as páginas pedem os nomes e números do **Aluno A** e do **Aluno B** e geram um relatório da equipa para entregar.
 
-## Publicar no GitHub Pages
+## Endereços
 
-1. Crie um repositório novo no GitHub (por exemplo `so-lab`).
-2. Carregue **todo o conteúdo desta pasta**, mantendo as subpastas `bancada/`, `revisao/`, `docs/` e `fichas/` e o ficheiro `.nojekyll`. No site do GitHub: **Add file → Upload files** e arraste os ficheiros e as pastas.
-3. Abra **Settings → Pages**. Em **Build and deployment**, escolha **Deploy from a branch**, depois a branch `main` e a pasta `/ (root)`. Clique em **Save**.
-4. Ao fim de um ou dois minutos, o site fica em `https://<utilizador>.github.io/so-lab/`.
+O site está publicado no GitHub Pages: **https://profalexandrapsilva-proglab.github.io/LAB_SO/**
 
 Endereços diretos, úteis para o Classroom ou o Moodle:
 
-- Trilhos: `…/#w5`, `…/#l5`, `…/#relatorio`
-- Bancada: `…/bancada/#lab01`, `#lab02`, `#lab03`, `#linux`, `#windows`, `#relatorio`
-- Revisão: `…/revisao/`
+- Trilhos: [W5 · Windows](https://profalexandrapsilva-proglab.github.io/LAB_SO/#w5) · [L5 · Ubuntu](https://profalexandrapsilva-proglab.github.io/LAB_SO/#l5) · [Relatório](https://profalexandrapsilva-proglab.github.io/LAB_SO/#relatorio)
+- Bancada: [Lab 01](https://profalexandrapsilva-proglab.github.io/LAB_SO/bancada/index.html#lab01) · [Lab 02](https://profalexandrapsilva-proglab.github.io/LAB_SO/bancada/index.html#lab02) · [Lab 03](https://profalexandrapsilva-proglab.github.io/LAB_SO/bancada/index.html#lab03)
+- Revisão: [16 labs de conceitos](https://profalexandrapsilva-proglab.github.io/LAB_SO/revisao/index.html)
+
+Para atualizar o site, basta substituir os ficheiros no repositório (**Add file → Upload files**). O GitHub Pages publica a alteração em um ou dois minutos.
 
 Para a pré-visualização do repositório nas redes sociais, use `docs/img/capa.png` em **Settings → General → Social preview**.
 
@@ -47,7 +46,6 @@ fichas/                 Fichas imprimíveis dos Labs 01 a 03
 docs/roteiro.md         Plano de todos os labs dos trilhos e estado de cada um
 docs/programa.md        Alinhamento com a UC02829 e a UC01990
 docs/img/               Capturas e imagem de capa
-.nojekyll               Impede o GitHub de processar as páginas
 ```
 
 ## Avisos
@@ -55,6 +53,6 @@ docs/img/               Capturas e imagem de capa
 - **Soluções:** o guia do professor, com respostas e grelhas, fica fora deste repositório público.
 - **Simulação:** os comandos e as janelas são reais, mas as saídas são simuladas. Cada página diz isso aos alunos.
 - **Requisitos oficiais:** a correção do Lab 01 segue as páginas da [Microsoft](https://learn.microsoft.com/windows/whats-new/windows-11-requirements) e do [Ubuntu](https://help.ubuntu.com/community/Installation/SystemRequirements). Reveja-as no início de cada ano letivo.
-- **Licença:** escolha uma antes de tornar o repositório público (por exemplo, CC BY-SA 4.0) e acrescente o ficheiro `LICENSE`.
+- **Licença:** [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.pt). Podem usar, adaptar e partilhar estes materiais, desde que indiquem a autoria e partilhem as adaptações com a mesma licença. Ver o ficheiro `LICENSE`.
 
 Autoria: Alexandra Silva @ 2026

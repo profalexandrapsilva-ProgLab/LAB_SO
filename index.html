@@ -65,6 +65,7 @@ table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid var(--li
 .split{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:24px;align-items:start}
 @media(min-width:1001px){.split>div:last-child{position:sticky;top:10px}}
 @media(max-width:1000px){.split{grid-template-columns:minmax(0,1fr)}}
+main.wide{max-width:1840px}@media(min-width:1001px){.split.work{grid-template-columns:minmax(280px,360px) minmax(0,1fr)}}
 .mis{list-style:none;margin:0 0 12px;padding:0;counter-reset:m}
 .mis li{counter-increment:m;border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 46px;margin:0 0 8px;position:relative;background:var(--panel);font-size:15px}
 .mis li::before{content:counter(m);position:absolute;left:11px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--zone);display:grid;place-items:center;font-weight:700;font-size:13px}
@@ -86,13 +87,13 @@ fieldset{border:1px solid var(--line);border-radius:12px;margin:0 0 12px;padding
 table.cmp th.cw{color:#0a5cff}table.cmp th.cl{color:#e95420}
 .rep{white-space:pre-wrap;font:13px/1.5 "JetBrains Mono",monospace;background:var(--zone);border-radius:10px;padding:14px;max-height:65vh;overflow:auto}
 /* terminais */
-.term{background:#300a24;color:#eeeeec;font:14px/1.45 "JetBrains Mono",monospace;border-radius:12px;padding:12px 14px;height:min(68vh,580px);overflow-y:auto;cursor:text;white-space:pre-wrap;overflow-wrap:anywhere}
+.term{background:#300a24;color:#eeeeec;font:var(--twf,14px)/1.45 "JetBrains Mono",monospace;border-radius:12px;padding:12px 14px;height:clamp(440px,calc(100vh - 210px),1100px);overflow-y:auto;cursor:text;white-space:pre-wrap;overflow-wrap:anywhere}
 .term.pst{background:#012456;color:#eeedf0;border-radius:0;height:100%}
 .term .er{color:#ff9b93}.term .pu{color:#8ae234;font-weight:600}.term .pp{color:#729fcf;font-weight:600}.term .pw{color:#eeedf0}
 .tin{display:flex}.term input{flex:1;background:transparent;border:0;color:inherit;font:inherit;padding:0;min-height:0;outline:none;caret-color:var(--amb);border-radius:0}.term input:focus-visible{outline:none}
 /* Windows simulado */
 .envbox.win{border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.18)}
-.wdesk{position:relative;height:min(72vh,620px);min-height:480px;background:radial-gradient(120% 90% at 70% 10%,#6fa8ff,#1d5bd6 45%,#0a2d75);font:14px/1.45 "Segoe UI",Figtree,system-ui,sans-serif;color:#1b1b1b;display:flex;flex-direction:column;padding:10px 10px 0}
+.wdesk{position:relative;height:clamp(520px,calc(100vh - 210px),1000px);min-height:480px;background:radial-gradient(120% 90% at 70% 10%,#6fa8ff,#1d5bd6 45%,#0a2d75);font:14px/1.45 "Segoe UI",Figtree,system-ui,sans-serif;color:#1b1b1b;display:flex;flex-direction:column;padding:10px 10px 0}
 .wdesk button{font:14px "Segoe UI",Figtree,sans-serif;min-height:34px;padding:0 12px;border-radius:5px;border:1px solid #c8c8c8;background:#fbfbfb;color:#1b1b1b}
 .wdesk button:hover{background:#f0f0f0;filter:none}
 .wdesk input,.wdesk select{font:14px "Segoe UI",Figtree,sans-serif;min-height:34px;padding:4px 8px;border:1px solid #c8c8c8;border-radius:5px;background:#fff;color:#1b1b1b;width:100%}
@@ -195,6 +196,42 @@ ${pz?`<p style="margin-top:10px"><b>Prazos</b></p><ul>${pz}</ul>`:''}
   const qscore=(n,ans,att)=>{let s=0;for(let j=0;j<n;j++)if(ans[j]===0)s+=att&&att[j]?0.5:1;return n?s/n:0};
   const gen=()=>{const a=new Uint32Array(5);crypto.getRandomValues(a);let s='';a.forEach(x=>s+=ABC[x%32]);return fmt(s+chk(s))};
   return{panel,valid,fmt,gen,clean,cyrb,code:()=>st.code,setCode:c=>{const v=fmt(c);if(clean(v)!==clean(st.code))st.prazos={};st.code=v;keep()},prazos:()=>st.prazos,errs,qscore,seal}
+})();
+
+/* ===== ProgLab · terminal em ecrã inteiro e tamanho de letra (comum às páginas dos alunos) ===== */
+const TW=(()=>{
+  const FK='proglab-term-letra';let f=14;try{f=Math.min(22,Math.max(12,+localStorage.getItem(FK)||14))}catch(e){}
+  const apply=()=>document.documentElement.style.setProperty('--twf',f+'px');apply();
+  const css=`.tw-wrap{min-width:0}
+.tw-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end;margin:0 0 6px;font:600 13px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif}
+.tw-bar button{min-height:32px;padding:0 10px;border-radius:7px;border:1px solid #9aa3ad;background:#fff;color:#11161d;cursor:pointer;font:inherit;width:auto}
+.tw-bar button:hover{background:#eef1f4}.tw-bar button:focus-visible{outline:3px solid #ffb400;outline-offset:1px}
+.tw-mis{margin-right:auto;display:none;color:#e8eaed;font-weight:500;max-width:100%}
+.tw-fs{position:fixed!important;inset:0;z-index:2000;background:#0b0f14;padding:10px 12px;display:flex;flex-direction:column;margin:0!important;border-radius:0}
+.tw-fs .tw-mis{display:block}
+.tw-fs .tw-bar button{background:#232b35;color:#fff;border-color:#4a525d}.tw-fs .tw-bar button:hover{background:#2f3945}
+.tw-fs>:not(.tw-bar){flex:1;min-height:0;height:auto!important;max-height:none!important;margin-top:0!important}
+.tw-fs .envbox:not(.term){display:flex;flex-direction:column}.tw-fs .envbox:not(.term)>*{flex:1;min-height:0}
+.tw-fs:not(.tw-pre) .term{height:100%!important}.tw-fs .wdesk{height:100%!important;min-height:0}
+.tw-fs.tw-pre .term{display:flex;flex-direction:column}.tw-fs.tw-pre pre{flex:1;height:auto!important}
+body.tw-lock{overflow:hidden}`;
+  let cur=null,timer=null;
+  function off(){if(!cur)return;cur.w.classList.remove('tw-fs');document.body.classList.remove('tw-lock');cur.b.textContent='Ecrã inteiro';cur.b.setAttribute('aria-pressed','false');clearInterval(timer);const t=cur;cur=null;t.focus()}
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&cur){e.preventDefault();off()}},true);
+  function attach(target,o={}){if(!target||target.closest('.tw-wrap'))return;
+    if(!document.getElementById('tw-css')){const s=document.createElement('style');s.id='tw-css';s.textContent=css;document.head.append(s)}
+    const w=document.createElement('div');w.className='tw-wrap'+(target.querySelector('pre')?' tw-pre':'');target.parentNode.insertBefore(w,target);
+    const bar=document.createElement('div');bar.className='tw-bar';
+    bar.innerHTML=`<span class="tw-mis" aria-live="polite"></span>${o.font===false?'':'<button type="button" data-a="-" aria-label="Letra mais pequena">A−</button><button type="button" data-a="+" aria-label="Letra maior">A+</button>'}<button type="button" data-a="fs" aria-pressed="false" title="Esc para sair">Ecrã inteiro</button>`;
+    w.append(bar,target);const mis=bar.querySelector('.tw-mis'),b=bar.querySelector('[data-a="fs"]');
+    const bottom=()=>requestAnimationFrame(()=>[target,...target.querySelectorAll('.term,pre')].forEach(x=>{if(x.matches('.term,pre'))x.scrollTop=x.scrollHeight}));
+    const focus=()=>{const i=target.querySelector('input');i&&i.focus({preventScroll:true})};
+    const upd=()=>{const m=o.mission?o.mission():'';mis.textContent=m?'Missão: '+m:''};
+    bar.onclick=e=>{const a=e.target.closest('button');if(!a)return;const k=a.dataset.a;
+      if(k==='+'||k==='-'){f=Math.min(22,Math.max(12,f+(k==='+'?1:-1)));apply();try{localStorage.setItem(FK,f)}catch(x){}bottom();return}
+      if(cur&&cur.w===w){off();return}off();w.classList.add('tw-fs');document.body.classList.add('tw-lock');b.textContent='Sair do ecrã inteiro (Esc)';b.setAttribute('aria-pressed','true');cur={w,b,focus};upd();timer=setInterval(upd,800);focus();bottom()};
+    return{update:upd}}
+  return{attach}
 })();
 
 /* ===== Cenários das equipas ===== */
@@ -591,12 +628,21 @@ function makeTerm(el,cfg){
 }
 
 /* ===== definição dos labs ===== */
+/* Pasta protegida para um grupo: os membros do grupo leem, criam e alteram (Modificar);
+   nenhum outro utilizador que não seja administrador tem qualquer acesso. */
+function wGroupOnly(m,t,folder,grp){const p=WROOT+'\\'+folder;if(!m.fs[p])return false;
+  const has=(u,cs)=>{const e=wEff(m,u,p);return [...cs].every(c=>e.has(c))};
+  const grpAce=wAcl(m,p).some(e=>e.t==='A'&&e.p.toLowerCase()===grp.toLowerCase()&&e.lv.some(l=>LVR[l].includes('w')));
+  const members=t.u.filter(u=>m.users[u]&&m.users[u].groups.includes(grp)&&!wIsAdmin(m,u));
+  const others=Object.keys(m.users).filter(u=>!wIsAdmin(m,u)&&!m.users[u].groups.includes(grp));
+  const admins=Object.keys(m.users).filter(u=>wIsAdmin(m,u)&&m.users[u].on&&!m.users[u].groups.includes(grp));
+  return grpAce&&members.length>0&&admins.every(u=>has(u,'rw'))&&members.every(u=>has(u,'rxwd')&&!wEff(m,u,p).has('p'))&&others.every(u=>{const e=wEff(m,u,p);return !e.has('r')&&!e.has('w')&&!e.has('x')})}
 const W5M=t=>{const[A1,A2,B1]=t.u;const fA=WROOT+'\\'+t.fA,fB=WROOT+'\\'+t.fB;return[
  {t:'Criar as contas',d:`Criem as contas ${A1}, ${A2} e ${B1}, com nome completo e palavra-passe.`,h:`Gestão de Computadores → Utilizadores → Novo utilizador…, ou no Terminal: New-LocalUser -Name ${A1} -FullName "${t.n[0]}"`,ok:m=>t.u.every(u=>m.users[u]&&m.users[u].on&&m.users[u].pw)},
  {t:'Criar os grupos',d:`Criem os grupos ${t.gA} (${t.lA}: ${A1} e ${A2}) e ${t.gB} (${t.lB}: ${B1}).`,h:`Grupos → Novo grupo…, ou: New-LocalGroup -Name ${t.gA} ; Add-LocalGroupMember -Group ${t.gA} -Member ${A1},${A2}`,ok:m=>m.groups[t.gA]&&m.groups[t.gB]&&[A1,A2].every(u=>m.users[u]?.groups.includes(t.gA))&&m.users[B1]?.groups.includes(t.gB)},
  {t:'Um só administrador',d:`${A1} gere o computador e passa a administrador. ${A2} e ${B1} ficam contas padrão.`,h:`Propriedades de ${A1} → Membro de → Adicionar «Administradores», ou: net localgroup Administradores ${A1} /add`,ok:m=>wIsAdmin(m,A1)&&!wIsAdmin(m,A2)&&!wIsAdmin(m,B1)},
- {t:`Proteger a pasta ${t.fA}`,d:`O grupo ${t.gA} pode criar e alterar ficheiros em ${fA}. Mais nenhum utilizador comum lhe pode aceder.`,h:`Propriedades → Avançadas → Desativar herança (converter) → remover Utilizadores → Adicionar ${t.gA} com Modificar. Ou: icacls ${fA} /inheritance:d ; icacls ${fA} /remove Utilizadores ; icacls ${fA} /grant ${t.gA}:(OI)(CI)M`,ok:m=>m.fs[fA]&&wEff(m,A2,fA).has('w')&&!wEff(m,B1,fA).has('r')},
- {t:`Configurar a pasta ${t.fB}`,d:`O grupo ${t.gB} cria e altera ficheiros em ${fB}. O grupo ${t.gA} só pode ler.`,h:`Desativar herança, remover Utilizadores, ${t.gB} com Modificar e ${t.gA} com Ler e executar.`,ok:m=>m.fs[fB]&&wEff(m,B1,fB).has('w')&&wEff(m,A2,fB).has('r')&&!wEff(m,A2,fB).has('w')},
+ {t:`Proteger a pasta ${t.fA}`,d:`O grupo ${t.gA} pode criar e alterar ficheiros em ${fA} (Modificar, sem Controlo total). Mais nenhum utilizador comum lhe pode aceder (os administradores mantêm o acesso).`,h:`Propriedades → Avançadas → Desativar herança (converter) → remover Utilizadores → Adicionar ${t.gA} com Modificar. Ou: icacls ${fA} /inheritance:d ; icacls ${fA} /remove Utilizadores ; icacls ${fA} /grant ${t.gA}:(OI)(CI)M`,ok:m=>wGroupOnly(m,t,t.fA,t.gA)},
+ {t:`Configurar a pasta ${t.fB}`,d:`O grupo ${t.gB} cria e altera ficheiros em ${fB}. O grupo ${t.gA} só pode ler.`,h:`Desativar herança, remover Utilizadores, ${t.gB} com Modificar e ${t.gA} com Ler e executar.`,ok:m=>{if(!m.fs[fB])return false;const b=wEff(m,B1,fB),a=wEff(m,A2,fB);return ['r','x','w','d'].every(c=>b.has(c))&&a.has('r')&&a.has('x')&&!a.has('w')&&!a.has('d')}},
  {t:'Testar com as contas',d:`Iniciem sessão como ${A2} e criem um documento em ${t.fA}. Depois, como ${B1}, confirmem que ${t.fA} fica inacessível.`,h:'Iniciar → Mudar de utilizador… e depois Explorador de Ficheiros.',ok:m=>m.tests.wA&&m.tests.dB},
  {t:'Ver o UAC em ação',d:`Com a sessão de uma conta padrão, abram a Gestão de Computadores e observem o pedido do UAC.`,h:'O UAC pede as credenciais de um administrador.',ok:m=>!!m.flags.uac},
  {t:'Desafio: PowerShell',d:'Façam pelo menos uma das tarefas anteriores no Terminal (PowerShell) em vez da janela gráfica.',h:'Por exemplo: New-LocalGroup, Add-LocalGroupMember ou icacls.',opt:1,ok:m=>!!m.flags.psChange}]};
@@ -613,7 +659,7 @@ const L5M=t=>{const[A1,A2,B1]=t.u;const fA='/srv/empresa/'+t.fA,fB='/srv/empresa
 const LABS={
  w5:{code:'W5',track:'w',title:'Contas, UAC e permissões NTFS',goal:'Criar contas locais e grupos, aplicar o princípio do menor privilégio com permissões NTFS e compreender o UAC.',env:'win',init:wInit,missions:W5M,
    ticket:t=>`«Bom dia. Sou ${t.n[1].split(' ')[0]}, da ${t.lA.toLowerCase()} da ${t.emp}. Consigo abrir a pasta ${t.fA}, mas quando tento guardar um ficheiro aparece "Acesso negado". O ${t.u[0]} consegue gravar sem problemas.»`,
-   fixed:(m,t)=>{const fA=WROOT+'\\'+t.fA;return wEff(m,t.u[1],fA).has('w')&&wEff(m,t.u[0],fA).has('w')&&!wEff(m,t.u[2],fA).has('r')},faultHint:'Comparem as permissões efetivas do utilizador com as do grupo. Vejam as entradas «Negar» em Propriedades → Segurança → Avançadas, ou com icacls.',refl:'Na mesma tarefa (proteger uma pasta para um grupo), comparem o modelo de permissões do Windows com o do Ubuntu. Qual é mais flexível e qual é mais simples de verificar? Justifiquem com exemplos deste lab.'},
+   fixed:(m,t)=>wGroupOnly(m,t,t.fA,t.gA),faultHint:'Comparem as permissões efetivas do utilizador com as do grupo. Vejam as entradas «Negar» em Propriedades → Segurança → Avançadas, ou com icacls.',refl:'Na mesma tarefa (proteger uma pasta para um grupo), comparem o modelo de permissões do Windows com o do Ubuntu. Qual é mais flexível e qual é mais simples de verificar? Justifiquem com exemplos deste lab.'},
  l5:{code:'L5',track:'l',title:'Utilizadores, grupos e permissões',goal:'Gerir utilizadores e grupos, aplicar permissões rwx e ACL, e usar su e sudo de forma segura.',env:'bash',init:lInit,missions:L5M,
    ticket:t=>`«Sou ${t.n[1].split(' ')[0]}, da ${t.emp}. Pertenço ao grupo ${t.gA}, mas quando faço cd /srv/empresa/${t.fA} aparece "Permissão recusada". Ontem funcionava.»`,
    fixed:(m,t)=>{const n=lget(m,'/srv/empresa/'+t.fA);return n&&n.g===t.gA&&lperm(m,n,t.u[1])===7&&n.m.slice(-1)==='0'},faultHint:'Vejam as permissões da pasta com ls -ld. Lembrem-se do que significa o x num diretório.',refl:'Na mesma tarefa (proteger uma pasta para um grupo), comparem o modelo rwx do Ubuntu com as ACL do Windows. Qual é mais flexível e qual é mais simples de verificar? Justifiquem com exemplos deste lab.'}
@@ -646,11 +692,11 @@ function renderLab(id){
   $('#view').innerHTML=`<section class="lab" style="--tc:${tr.col}"><div class="lhead"><div><div class="kick">Trilho ${tr.name} · ${L.code} · Equipa ${nn()} · ${esc(t.emp)}</div><h2>${esc(L.title)}${labDone(id)?'<span class="badge">Concluído</span>':''}</h2><p class="lead">${esc(L.goal)}</p></div></div>
    <nav class="phases" aria-label="Fases do laboratório">${PHASES.map(([k,n],i)=>`<button data-ph="${k}" class="${s.phase===k?'on':''} ${phaseDone(id,k)?'ok':''}"><i>${phaseDone(id,k)?'✓':i+1}</i>${n}</button>`).join('')}</nav><div id="phase"></div></section>`;
   $('#view').querySelectorAll('[data-ph]').forEach(b=>b.onclick=()=>{s.phase=b.dataset.ph;save();renderLab(id);$('.phases').scrollIntoView({block:'start'})});
-  const P=$('#phase');
+  const P=$('#phase');$('main').classList.toggle('wide',s.phase==='praticar'||s.phase==='avaria');
   if(s.phase==='aprender'){s.seen.aprender=true;save();P.innerHTML=(id==='w5'?learnW5(t):learnL5(t))+nextBtn('praticar');bindLearn(id);}
-  if(s.phase==='praticar'){P.innerHTML=`<div class="split"><div><h3>Missões</h3><p class="small">Verificadas automaticamente pelo estado do sistema: qualquer caminho correto conta.</p><ol class="mis" id="mis"></ol><button class="ghost" id="reset">Repor esta máquina</button></div><div><div id="env" class="envbox"></div></div></div>${nextBtn('avaria')}`;mountEnv(id,'prac');paintMis(id);
+  if(s.phase==='praticar'){P.innerHTML=`<div class="split work"><div><h3>Missões</h3><p class="small">Verificadas automaticamente pelo estado do sistema: qualquer caminho correto conta.</p><ol class="mis" id="mis"></ol><button class="ghost" id="reset">Repor esta máquina</button></div><div><div id="env" class="envbox"></div></div></div>${nextBtn('avaria')}`;mountEnv(id,'prac');paintMis(id);
     $('#reset').onclick=e=>{const b=e.target;if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Confirmar: apagar o que foi feito';return}s.prac=L.init(t,false);save();renderLab(id)}}
-  if(s.phase==='avaria'){P.innerHTML=`<div class="split"><div><div class="ticket"><b>Pedido de apoio #${100+ALL.cur*7}</b><p>${esc(L.ticket(t))}</p></div><p class="small">A máquina desta fase é outra: já tem as contas e as pastas configuradas, com um problema escondido. Corrijam-no sem dar mais acesso do que o necessário.</p><details><summary>Pista</summary><p class="small">${esc(L.faultHint)}</p></details><label class="l" for="diag">Diagnóstico: causa, como a encontraram e o que alteraram (mínimo 25 palavras)</label><textarea id="diag">${esc(s.diag)}</textarea><div class="small" id="dcount"></div><div id="fstat" class="panel"></div><button class="ghost" id="freset">Repor a máquina avariada</button></div><div><div id="env" class="envbox"></div></div></div>${nextBtn('verificar')}`;
+  if(s.phase==='avaria'){P.innerHTML=`<div class="split work"><div><div class="ticket"><b>Pedido de apoio #${100+ALL.cur*7}</b><p>${esc(L.ticket(t))}</p></div><p class="small">A máquina desta fase é outra: já tem as contas e as pastas configuradas, com um problema escondido. Corrijam-no sem dar mais acesso do que o necessário.</p><details><summary>Pista</summary><p class="small">${esc(L.faultHint)}</p></details><label class="l" for="diag">Diagnóstico: causa, como a encontraram e o que alteraram (mínimo 25 palavras)</label><textarea id="diag">${esc(s.diag)}</textarea><div class="small" id="dcount"></div><div id="fstat" class="panel"></div><button class="ghost" id="freset">Repor a máquina avariada</button></div><div><div id="env" class="envbox"></div></div></div>${nextBtn('verificar')}`;
     mountEnv(id,'fault');const upd=()=>{let ok=false;try{ok=L.fixed(s.fault,t)}catch(e){}const w=words(s.diag).length;$('#dcount').textContent=`${w} palavras`;$('#fstat').className='panel '+(ok&&w>=25?'done':'todo');$('#fstat').innerHTML=ok?(w>=25?'<b>Avaria resolvida e diagnóstico registado.</b>':'<b>Avaria resolvida.</b> Falta completar o diagnóstico.'):'<b>Ainda por resolver.</b> O utilizador continua sem o acesso de que precisa, ou alguém ficou com acesso a mais.';refreshPhases(id)};
     $('#diag').oninput=e=>{s.diag=e.target.value;save();upd()};s.__upd=upd;upd();$('#freset').onclick=e=>{const b=e.target;if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Confirmar';return}s.fault=L.init(t,true);save();renderLab(id)}}
   if(s.phase==='verificar'){P.innerHTML=`<div class="narrow"><div id="quiz"></div><button id="qcheck">Verificar respostas</button><span id="qres" class="small" style="margin-left:10px"></span></div>${nextBtn('comparar')}`;paintQuiz(id)}
@@ -659,9 +705,9 @@ function renderLab(id){
   $('#view').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{s.phase=b.dataset.go;save();renderLab(id);$('.phases').scrollIntoView({block:'start'})});
 }
 function nextBtn(ph){const n=PHASES.find(p=>p[0]===ph);return `<div class="next"><button data-go="${ph}">Seguinte: ${n[1]} →</button></div>`}
-function refreshPhases(id){document.querySelectorAll('.phases [data-ph]').forEach((b,i)=>{const ok=phaseDone(id,b.dataset.ph);b.classList.toggle('ok',ok);b.querySelector('i').textContent=ok?'✓':i+1});const h=$('.lhead h2');if(h&&labDone(id)&&!h.querySelector('.badge'))h.insertAdjacentHTML('beforeend','<span class="badge">Concluído</span>');if(labDone(id)&&!LS(id).done){LS(id).done=true;LS(id).doneAt=new Date().toISOString();save()}}
+function refreshPhases(id){document.querySelectorAll('.phases [data-ph]').forEach((b,i)=>{const ok=phaseDone(id,b.dataset.ph);b.classList.toggle('ok',ok);b.querySelector('i').textContent=ok?'✓':i+1});const h=$('.lhead h2');if(h&&labDone(id)&&!h.querySelector('.badge'))h.insertAdjacentHTML('beforeend','<span class="badge">Concluído</span>');if(labDone(id)&&!LS(id).done){LS(id).done=true;LS(id).doneAt=new Date().toLocaleString('pt-PT');save()}}
 function paintMis(id){const el=$('#mis');if(!el)return;const ms=misState(id);const first=ms.findIndex(x=>!x.done&&!x.opt);el.innerHTML=ms.map((x,i)=>`<li class="${x.done?'done':''} ${i===first?'cur':''} ${x.opt?'xopt':''}"><b>${esc(x.t)}</b>${esc(x.d)}<details><summary>Pista</summary><code>${esc(x.h)}</code></details></li>`).join('');refreshPhases(id)}
-function mountEnv(id,which){const L=LABS[id],s=LS(id),m=s[which],el=$('#env');const after=()=>{save();if(which==='prac')paintMis(id);else s.__upd&&s.__upd()};
+function mountEnv(id,which){const L=LABS[id],s=LS(id),m=s[which],el=$('#env');TW.attach(el,{font:L.env!=='win',mission:()=>{if(which!=='prac')return 'corrigir a avaria do pedido de apoio';const x=misState(id).find(q=>!q.done&&!q.opt);return x?`${x.t}. ${x.d}`:'todas as missões obrigatórias concluídas'}});const after=()=>{save();if(which==='prac')paintMis(id);else s.__upd&&s.__upd()};
   if(L.env==='win'){el.className='envbox win';const host=document.createElement('div');el.innerHTML='';el.append(host);host.addEventListener('click',e=>wClick(host,e));wRender(host,m,after)}
   else{el.className='envbox bash';makeTerm(el,{store:m,welcome:`Ubuntu 24.04.3 LTS (simulado) · ${m.host} · equipa ${nn()}\nSessão: aluno (administrador, grupo sudo). Escrevam help.`,prompt:()=>{const u=lcur(m);const home=m.users[u]?.home||'/';const p=m.cwd===home?'~':m.cwd.startsWith(home+'/')?'~'+m.cwd.slice(home.length):m.cwd;return[{t:`${u}@${m.host}`,c:'pu'},{t:':'},{t:p,c:'pp'},{t:u==='root'?'# ':'$ '}]},run:(l,ask)=>lRun(m,l,ask),after})}}
 function paintQuiz(id){const s=LS(id),Q=QUIZ[id];
@@ -715,7 +761,7 @@ function plLab(id){const Lb=LABS[id],s=TS()[id],t=T();const base={id:Lb.code,tit
   const Q=QUIZ[id],m=[s.prac,s.fault];const hist=[...(s.prac.hist||[]).map(c=>({onde:'Prática',c})),...(s.fault.hist||[]).map(c=>({onde:'Avaria',c}))];
   const errs=m.reduce((n,x)=>n+(x.errs||0),0);
   const touched=s.seen.aprender||hist.length||Object.keys(s.ans).length||s.diag||s.refl||(s.prac.log||[]).length;
-  return{...base,estado:labDone(id)?'concluido':touched?'em_curso':'por_iniciar',concluidoEm:/^\d{4}-/.test(s.doneAt||'')?s.doneAt:'',
+  return{...base,estado:labDone(id)?'concluido':touched?'em_curso':'por_iniciar',concluidoEm:s.doneAt||'',
     fases:PHASES.map(([p,n])=>({nome:n,ok:phaseDone(id,p)})),
     componentes:[{nome:'Missões obrigatórias',valor:req.length?req.filter(x=>x.done).length/req.length:0,detalhe:`${req.filter(x=>x.done).length}/${req.length}`},
       {nome:'Avaria resolvida',valor:fx?1:0,detalhe:fx?'sim':'não'},
@@ -735,7 +781,7 @@ function renderReport(){$('#view').innerHTML=`<section class="narrow"><div id="p
   $('#rdl').onclick=()=>{try{const u=URL.createObjectURL(new Blob([report()],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download=`relatorio-trilhos-eq${nn()}-${([ALL.id.a.num,ALL.id.b.num].filter(Boolean).join('-').replace(/[^\w-]+/g,'')||'alunos')}.txt`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);$('#rmsg').textContent='Se a transferência não começar, usem «Copiar relatório».'}catch(e){$('#rmsg').textContent='Transferência bloqueada: usem «Copiar relatório».'}}}
 
 /* ===== navegação ===== */
-function route(){const h=location.hash.slice(1);document.querySelectorAll('.topnav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+(h||'inicio')));document.documentElement.style.removeProperty('--tc');
+function route(){const h=location.hash.slice(1);$('main').classList.remove('wide');document.querySelectorAll('.topnav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+(h||'inicio')));document.documentElement.style.removeProperty('--tc');
   if(LABS[h])renderLab(h);else if(h==='relatorio')renderReport();else renderHome();scrollTo(0,0)}
 addEventListener('hashchange',route);
 route();

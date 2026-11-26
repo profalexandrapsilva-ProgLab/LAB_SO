@@ -53,7 +53,7 @@ Para a pré-visualização do repositório nas redes sociais, use `docs/img/capa
 - Cifra AES-256-GCM com chave derivada da palavra-passe (PBKDF2-SHA-256, 600 000 iterações). A chave só existe em memória.
 - Bloqueia ao fim de 15 minutos sem atividade, ao recarregar a página e no botão **Bloquear**. Depois de 5 tentativas erradas, a entrada fica suspensa durante algum tempo.
 - A página tem uma política de segurança (CSP) que impede qualquer ligação a servidores.
-- As cópias de segurança são cifradas com a mesma palavra-passe. **Sem a palavra-passe não há recuperação**: guardem-na num gestor de palavras-passe e façam cópias regularmente em **Dados e privacidade**. A área está preparada para outras disciplinas (C++, Java POO, Bases de Dados): os ficheiros de entrega usam um formato comum, `proglab-entrega`.
+- As cópias de segurança são cifradas com a mesma palavra-passe. **Sem a palavra-passe não há recuperação**: guardem-na num gestor de palavras-passe e façam cópias regularmente em **Dados e privacidade**. A área está preparada para outras disciplinas (Programação em C++, POO em C#, Bases de Dados): os ficheiros de entrega usam um formato comum, `proglab-entrega`.
 
 ## Estrutura
 

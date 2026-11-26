@@ -17,7 +17,7 @@ Todas as páginas pedem os nomes e números do **Aluno A** e do **Aluno B** e ge
 
 ## Endereços
 
-Endereço previsto do site no GitHub Pages: **https://profalexandrapsilva-proglab.github.io/LAB_SO/**
+O site está publicado no GitHub Pages: **https://profalexandrapsilva-proglab.github.io/LAB_SO/**
 
 Endereços diretos, úteis para o Classroom ou o Moodle:
 
@@ -26,7 +26,7 @@ Endereços diretos, úteis para o Classroom ou o Moodle:
 - Revisão: [16 labs de conceitos](https://profalexandrapsilva-proglab.github.io/LAB_SO/revisao/index.html)
 - Área da professora: [ProgLab Teacher](https://profalexandrapsilva-proglab.github.io/LAB_SO/professora/index.html)
 
-Para atualizar o site, basta substituir os ficheiros no repositório (**Add file → Upload files**). Confirme a publicação em Actions e Settings → Pages; não publique esta versão antes de concluir o teste no navegador.
+Para atualizar o site, basta substituir os ficheiros no repositório (**Add file → Upload files**). O GitHub Pages publica a alteração em um ou dois minutos.
 
 Para a pré-visualização do repositório nas redes sociais, use `docs/img/capa.png` em **Settings → General → Social preview**.
 
@@ -42,13 +42,18 @@ Para a pré-visualização do repositório nas redes sociais, use `docs/img/capa
 
 ![ProgLab Teacher · painel com dados fictícios](docs/img/professora-painel.png)
 
-1. Em `/professora/`, criem primeiro o cofre com uma palavra-passe forte (12 ou mais caracteres) e depois criem a turma. A área gera um **código de turma** (por exemplo `K7Q-3MX`).
+1. Em `/professora/`, criem primeiro o **cofre** com uma palavra-passe forte (12 ou mais caracteres) e depois a turma. A área gera um **código de turma** (por exemplo `K7Q-3MX`).
 2. Registem os alunos (número, nome e equipa). Podem colar a lista do Excel.
 3. Em **Laboratórios e prazos**, escolham os labs e os prazos e partilhem a ligação com os alunos.
 4. Importem os ficheiros de entrega (podem arrastar vários de uma vez). Em cada entrega veem as missões, as perguntas e os erros, as respostas escritas, os comandos executados e uma nota automática sugerida.
 5. Atribuam a nota e o feedback e exportem a **pauta** para Excel.
 
-**Sem servidor:** os dados da área ficam cifrados (AES-GCM 256 bits, chave derivada com PBKDF2-SHA-256) em IndexedDB. O cofre pede uma palavra-passe e não é uma conta online. Façam cópias de segurança cifradas em **Dados e privacidade**; guardem a palavra-passe separadamente. Os ficheiros Excel e os JSON dos alunos não são cifrados. Usem um computador e perfil exclusivos e HTTPS. A publicação do código é pública; a cifra protege os dados locais em repouso, não uma sessão aberta. A área está preparada para outras disciplinas (C++, Java POO, Bases de Dados): os ficheiros de entrega usam um formato comum, `proglab-entrega`.
+**Sem servidor e cifrado:** os dados da área ficam só no navegador da professora, cifrados com a palavra-passe do cofre.
+
+- Cifra AES-256-GCM com chave derivada da palavra-passe (PBKDF2-SHA-256, 600 000 iterações). A chave só existe em memória.
+- Bloqueia ao fim de 15 minutos sem atividade, ao recarregar a página e no botão **Bloquear**. Depois de 5 tentativas erradas, a entrada fica suspensa durante algum tempo.
+- A página tem uma política de segurança (CSP) que impede qualquer ligação a servidores.
+- As cópias de segurança são cifradas com a mesma palavra-passe. **Sem a palavra-passe não há recuperação**: guardem-na num gestor de palavras-passe e façam cópias regularmente em **Dados e privacidade**. A área está preparada para outras disciplinas (C++, Java POO, Bases de Dados): os ficheiros de entrega usam um formato comum, `proglab-entrega`.
 
 ## Estrutura
 
@@ -71,13 +76,3 @@ docs/img/               Capturas e imagem de capa
 - **Licença:** [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.pt). Podem usar, adaptar e partilhar estes materiais, desde que indiquem a autoria e partilhem as adaptações com a mesma licença. Ver o ficheiro `LICENSE`.
 
 Autoria: Alexandra Silva @ 2026
-
-## ProgLab Teacher — revisão de segurança (candidato v1.1)
-
-- Registe os dois alunos por equipa (01 a 08) e atribua os laboratórios antes de receber entregas. A importação recusa formatos inválidos, equipas/alunos incorretos, selos incoerentes, laboratórios inexistentes e versões duplicadas; laboratórios conhecidos mas não atribuídos são ignorados com aviso.
-- O selo é um mecanismo de coerência, não uma assinatura digital. Qualquer aluno pode alterar dados e recalcular o selo. A pontuação automática é apenas indicativa; inconsistências detetadas bloqueiam a sugestão. A nota final exige revisão humana.
-- A data de geração vem do equipamento do aluno e não é uma prova de cumprimento de prazo. Confirme os prazos no Teams.
-- Após receber entregas, a composição da turma fica bloqueada para proteger a associação das notas. Crie uma nova turma para uma nova composição.
-- A primeira abertura tenta migrar dados antigos válidos; faça previamente uma cópia. Cópias antigas JSON podem ser restauradas se passarem a validação; dados incompatíveis são recusados sem substituir os atuais.
-- Mantenha o guia privado `docs/professor.md` fora do GitHub. Não publique cópias de segurança, pautas, dados de alunos nem ficheiros de entrega.
-- Licença: mantém-se a CC BY-SA 4.0 original. Não foi efetuada qualquer alteração dos direitos de utilização. Se pretender um modelo comercial com restrições adicionais, deve decidir expressamente a licença futura; os direitos já concedidos não são revogados por alterar este ficheiro.
